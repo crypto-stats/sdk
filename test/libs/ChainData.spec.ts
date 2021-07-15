@@ -1,13 +1,20 @@
 import { expect } from 'chai';
+import { MemoryCache } from '../../src/caches/MemoryCache';
 import { ChainData } from '../../src/libs/ChainData';
 import { Graph } from '../../src/libs/Graph';
 import { HTTP } from '../../src/libs/HTTP';
 
 describe('Graph', function() {
-  let chainData = new ChainData({ graph: new Graph({ http: new HTTP() }) });
+  let chainData = new ChainData({
+    graph: new Graph({ http: new HTTP() }),
+    cache: new MemoryCache(),
+  });
 
   beforeEach(() => {
-    chainData = new ChainData({ graph: new Graph({ http: new HTTP() }) });
+    chainData = new ChainData({
+      graph: new Graph({ http: new HTTP() }),
+      cache: new MemoryCache(),
+    });
   });
 
   it('should query the Ethereum block number', async () => {

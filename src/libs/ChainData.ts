@@ -1,15 +1,20 @@
 import { Graph } from './Graph';
+import { ICache } from '../types';
 
 interface ChainDataProps {
   graph: Graph;
+  cache: ICache;
 }
 
 export class ChainData {
   private graph: Graph;
+  private cache: ICache;
   blockNumLoaders: { [id: string]: (date: string) => Promise<number> } = {};
+  promiseCache: { [id: string]: Promise<number> } = {};
 
-  constructor({ graph }: ChainDataProps) {
+  constructor({ graph, cache }: ChainDataProps) {
     this.graph = graph;
+    this.cache = cache;
 
     this.blockNumLoaders.ethereum = this.getBlockSubgraphQuery('blocklytics/ethereum-blocks');
     this.blockNumLoaders.polygon = this.getBlockSubgraphQuery('elkfinance/matic-blocks');
@@ -36,11 +41,21 @@ export class ChainData {
     };
   }
 
-  async getBlockNumber(date: string, chain: string = 'ethereum') {
-    // TODO: Caching
+  getBlockNumber(date: string, chain: string = 'ethereum') {
+    const key = `${chain}-${date}`;
+    if (!this.promiseCache[key]) {
+      this.promiseCache[key] = this.getBlockNumberInternal(date, chain);
+    }
+    return this.promiseCache[key];
+  }
 
-    // eslint-disable-next-line no-console
-    // console.log(`Cache miss for block number for ${chain} on ${date}`);
+  private async getBlockNumberInternal(date: string, chain: string) {
+    const cachedValue = await this.cache.getValue(chain, 'block', date);
+    if (cachedValue) {
+      return cachedValue;
+    }
+
+    console.log(`Cache miss for block number for ${chain} on ${date}`);
 
     const loader = this.blockNumLoaders[chain];
     if (!loader) {
@@ -48,6 +63,8 @@ export class ChainData {
     }
 
     const block = await loader(date);
+
+    await this.cache.setValue(chain, 'block', date, block);
 
     return block;
   }

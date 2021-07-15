@@ -15,7 +15,7 @@ export class MongoCache {
     dbName = 'cryptostats',
     collectionName = 'cache',
     client = MongoClient,
-  }: MongoCacheOptions) {
+  }: MongoCacheOptions = {}) {
     this.dbName = dbName;
     this.collectionName = collectionName;
     this.client = new client(connectionString);
@@ -37,7 +37,7 @@ export class MongoCache {
   }
 
   async setValue(name: string, type: string, date: string, value: string | number) {
-    return this.client
+    await this.client
       .db(this.dbName)
       .collection(this.collectionName)
       .insertOne({ name, type, date, value });

@@ -2,13 +2,17 @@
   "name": "@cryptostats/sdk",
   "version": "0.0.1",
   "description": "Download and execute CryptoStats adapters",
-  "main": "index.js",
+  "main": "dist/CryptoStatsSDK.js",
+  "types": "dist/CryptoStatsSDK.d.ts",
   "repository": "https://github.com/crypto-stats/sdk",
   "author": "David Mihal <david@dmihal.com>",
   "license": "MIT",
   "scripts": {
     "test": "mocha -r ts-node/register test/\\*\\*/\\*.spec.ts"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@types/chai": "^4.2.21",
     "@types/mocha": "^8.2.3",

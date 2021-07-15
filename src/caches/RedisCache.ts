@@ -12,7 +12,7 @@ export class RedisCache {
 
   constructor(redisUrl: string, {
     redisLibrary = redis,
-  }: RedisCacheOptions) {
+  }: RedisCacheOptions = {}) {
     this.client = redisLibrary.createClient({ url: redisUrl });
     this.get = promisify(this.client.get).bind(this.client);
     this.set = promisify(this.client.set).bind(this.client);

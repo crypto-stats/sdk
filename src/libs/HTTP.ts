@@ -1,4 +1,5 @@
 import 'isomorphic-fetch';
+declare const fetch: any;
 
 export class HTTP {
   async get(url: string, options?: any) {

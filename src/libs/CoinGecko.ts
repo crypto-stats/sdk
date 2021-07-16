@@ -60,7 +60,7 @@ export class CoinGecko {
     ]);
   }
 
-  private async queryCoingecko(name: string, date: string, currency = 'usd') {
+  async queryCoingecko(name: string, date: string, currency = 'usd') {
     // eslint-disable-next-line no-console
     console.log(`Querying CoinGecko for ${name} on ${date}`);
 

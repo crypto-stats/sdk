@@ -1,5 +1,4 @@
-import { create, CID } from 'ipfs-http-client';
-import type { IPFS } from 'ipfs-core-types';
+import { CID } from 'ipfs-http-client';
 import { MemoryCache } from './caches/MemoryCache';
 import { MongoCache } from './caches/MongoCache';
 import { RedisCache } from './caches/RedisCache';
@@ -7,6 +6,7 @@ import { MultiCache } from './caches/MultiCache';
 import { ChainData } from './libs/ChainData';
 import { CoinGecko } from './libs/CoinGecko';
 import { DateLib } from './libs/DateLib';
+import { IPFS } from './libs/IPFS';
 import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
 import { ICache } from './types';
@@ -19,7 +19,6 @@ export interface CryptoStatsOptions {
 }
 
 export class CryptoStatsSDK {
-  private ipfsClient: IPFS;
   private cache: ICache;
   
   readonly coinGecko: CoinGecko;
@@ -27,15 +26,14 @@ export class CryptoStatsSDK {
   readonly date: DateLib;
   readonly graph: Graph;
   readonly http: HTTP;
+  readonly ipfs: IPFS;
 
   constructor({
-    ipfsGateway = 'https://ipfs.io',
+    ipfsGateway,
     cache,
     mongoConnectionString,
     redisConnectionString,
   }: CryptoStatsOptions = {}) {
-    this.ipfsClient = create({ url: ipfsGateway });
-
     if (cache) {
       this.cache = cache;
     } else if (mongoConnectionString || redisConnectionString) {
@@ -53,6 +51,7 @@ export class CryptoStatsSDK {
 
     this.date = new DateLib();
     this.http = new HTTP();
+    this.ipfs = new IPFS({ gateway: ipfsGateway });
     this.graph = new Graph({ http: this.http });
     this.chainData = new ChainData({ graph: this.graph, cache: this.cache });
     this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache });

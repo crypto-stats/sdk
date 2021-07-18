@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "date-fns": "^2.22.1",
-    "ipfs-http-client": "^50.1.2",
+    "ipfs-http-client": "^49.0.4",
     "isomorphic-fetch": "^3.0.0",
     "it-all": "^1.0.5",
     "mongodb": "^4.0.0",

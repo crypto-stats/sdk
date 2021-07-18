@@ -1,5 +1,6 @@
-import { create, CID } from 'ipfs-http-client';
-import type { IPFS as IPFSClient } from 'ipfs-core-types';
+import ipfsClient from 'ipfs-http-client';
+import CID from 'cids';
+import type { RootAPI as IPFSClient } from 'ipfs-core-types';
 import uint8ArrayConcat from 'uint8arrays/concat';
 import all from 'it-all';
 
@@ -13,7 +14,7 @@ export class IPFS {
   constructor({
     gateway = 'https://ipfs.io',
   }: IPFSOptions = {}) {
-    this.client = create({ url: gateway });
+    this.client = ipfsClient({ url: gateway }) as IPFSClient;
   }
 
   async getFile(cid: string | CID) {

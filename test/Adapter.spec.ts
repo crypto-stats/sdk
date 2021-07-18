@@ -3,7 +3,9 @@ import { Adapter } from '../src/Adapter';
 import { IPFS } from '../src/libs/IPFS';
 
 describe('Adapter', function() {
-  it('should load asyncronous data in metadata', async () => {
+  it('should load asyncronous data in metadata', async function () {
+    this.timeout(5000);
+
     const ipfs = new IPFS();
 
     const adapter = new Adapter('polymarket', {

@@ -1,4 +1,3 @@
-import { CID } from 'ipfs-http-client';
 import { MemoryCache } from './caches/MemoryCache';
 import { MongoCache } from './caches/MongoCache';
 import { RedisCache } from './caches/RedisCache';
@@ -9,6 +8,8 @@ import { DateLib } from './libs/DateLib';
 import { IPFS } from './libs/IPFS';
 import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
+import { Context } from './Context';
+import { List } from './List';
 import { ICache } from './types';
 
 export interface CryptoStatsOptions {
@@ -27,6 +28,8 @@ export class CryptoStatsSDK {
   readonly graph: Graph;
   readonly http: HTTP;
   readonly ipfs: IPFS;
+
+  private lists: { [name: string]: List } = {};
 
   constructor({
     ipfsGateway,
@@ -57,22 +60,23 @@ export class CryptoStatsSDK {
     this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache });
   }
 
-  async getAdapter(cid: CID | string) {
-    for await (const file of this.ipfsClient.get(cid)) {
-      if (file.type !== 'file') {
-        throw new Error(`CID ${cid.toString()} is a ${file.type}, expected file`)
-      }
-
-      if (!(file as any).content) continue;
-
-      let content = ''
-
-      for await (const chunk of (file as any).content) {
-        content += chunk.toString('utf8')
-      }
-
-      return content;
+  async getList(name: string) {
+    if (!this.lists[name]) {
+      this.lists[name] = new List(name, this);
     }
-    throw new Error(`No files found for CID ${cid.toString()}`)
+    return this.lists[name];
+  }
+
+  getContext(list: List) {
+    const context = new Context({
+      coinGecko: this.coinGecko,
+      chainData: this.chainData,
+      date: this.date,
+      graph: this.graph,
+      http: this.http,
+      ipfs: this.ipfs,
+      list,
+    });
+    return context;
   }
 }

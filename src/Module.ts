@@ -1,8 +1,7 @@
 import vm from 'vm'
 import { Adapter } from './Adapter'
 import { Context } from './Context'
-
-type SetupFn = (context: Context) => void;
+import { SetupFn } from './types';
 
 interface ModuleProps {
   code?: string;

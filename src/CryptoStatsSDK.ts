@@ -60,7 +60,7 @@ export class CryptoStatsSDK {
     this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache });
   }
 
-  async getList(name: string) {
+  getList(name: string) {
     if (!this.lists[name]) {
       this.lists[name] = new List(name, this);
     }

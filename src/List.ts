@@ -15,6 +15,10 @@ export class List {
   }
 
   addAdapter({ id, queries, metadata }: { id: string; queries: any; metadata: any }) {
+    if (this.adaptersById[id]) {
+      throw new Error(`Adapter '${id}' already added`);
+    }
+
     const adapter = new Adapter(id, metadata);
     for (let name in queries) {
       adapter.addQuery(name, queries[name]);
@@ -32,6 +36,10 @@ export class List {
 
   getAdapter(id: string) {
     return this.adaptersById[id] || null;
+  }
+
+  getIDs() {
+    return Object.keys(this.adaptersById);
   }
 
   async executeQuery(type: string, date: string) {

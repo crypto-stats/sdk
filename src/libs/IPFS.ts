@@ -40,4 +40,8 @@ export class IPFS {
     const base64 = Buffer.from(data).toString('base64');
     return `data:${mimeType};base64,${base64}`;
   }
+
+  getDataURILoader(cid: string | CID, mimeType: string) {
+    return () => this.getDataURI(cid, mimeType);
+  }
 }

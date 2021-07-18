@@ -26,7 +26,9 @@
     "date-fns": "^2.22.1",
     "ipfs-http-client": "^50.1.2",
     "isomorphic-fetch": "^3.0.0",
+    "it-all": "^1.0.5",
     "mongodb": "^4.0.0",
-    "redis": "^3.1.2"
+    "redis": "^3.1.2",
+    "uint8arrays": "^2.1.7"
   }
 }

@@ -20,7 +20,7 @@ export interface CryptoStatsOptions {
 }
 
 export class CryptoStatsSDK {
-  private cache: ICache;
+  readonly cache: ICache;
   
   readonly coinGecko: CoinGecko;
   readonly chainData: ChainData;

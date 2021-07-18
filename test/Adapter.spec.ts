@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { Adapter } from '../src/Adapter';
 import { IPFS } from '../src/libs/IPFS';
+import { MemoryCache } from '../src/caches/MemoryCache';
 
 describe('Adapter', function() {
   it('should load asyncronous data in metadata', async function () {
@@ -9,8 +10,10 @@ describe('Adapter', function() {
     const ipfs = new IPFS();
 
     const adapter = new Adapter('polymarket', {
-      name: 'Polymarket',
-      icon: ipfs.getDataURILoader('QmagaZMuMQKU2a5aJ2VofXBNwHmYpzo8GUR9CCjLWbgxTE', 'image/svg+xml'),
+      metadata: {
+        name: 'Polymarket',
+        icon: ipfs.getDataURILoader('QmagaZMuMQKU2a5aJ2VofXBNwHmYpzo8GUR9CCjLWbgxTE', 'image/svg+xml'),
+      },
     });
 
     const metadata = await adapter.getMetadata();
@@ -19,5 +22,37 @@ describe('Adapter', function() {
       name: 'Polymarket',
       icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAyOCAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTI2LjUxOSAzMy4yMjQyTDEuNDQ3NzUgMjYuMDYxVjkuOTQzODVMMjYuNTE5IDE3LjEwN1YzMy4yMjQyWiIgc3Ryb2tlPSIjMDEwMjAyIiBzdHJva2Utd2lkdGg9IjIuNjg2MiIvPgo8cGF0aCBkPSJNMjYuNTE5IDEuODg1MjVMMS40NDc3NSA5LjA0ODQ1VjI1LjE2NTdMMjYuNTE5IDE4LjAwMjVWMS44ODUyNVoiIHN0cm9rZT0iIzAxMDIwMiIgc3Ryb2tlLXdpZHRoPSIyLjY4NjIiLz4KPC9zdmc+Cg==',
     });
+  });
+
+  it('should save query data to the cache', async function() {
+    const cache = new MemoryCache();
+    const adapter = new Adapter('polymarket', {
+      metadata: {},
+      cache: cache,
+    });
+    adapter.addQuery('fee', async () => 50);
+
+    const testDate = '2021-01-01';
+
+    expect(await adapter.query('fee', testDate)).to.equal(50);
+
+    expect(await cache.getValue('polymarket', 'fee', testDate)).to.equal(50);
+  });
+
+  it('should read query data from the cache', async function() {
+    const testDate = '2021-01-01';
+    
+    const cache = new MemoryCache();
+    cache.setValue('polymarket', 'fee', testDate, 100);
+
+    const adapter = new Adapter('polymarket', {
+      metadata: {},
+      cache: cache,
+    });
+
+    // The adapter should NOT return 50, since it reads the cache
+    adapter.addQuery('fee', async () => 50);
+
+    expect(await adapter.query('fee', testDate)).to.equal(100);
   });
 });

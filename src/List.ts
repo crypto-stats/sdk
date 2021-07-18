@@ -19,7 +19,11 @@ export class List {
       throw new Error(`Adapter '${id}' already added`);
     }
 
-    const adapter = new Adapter(id, metadata);
+    const adapter = new Adapter(id, {
+      metadata,
+      cache: this.sdk?.cache,
+    });
+
     for (let name in queries) {
       adapter.addQuery(name, queries[name]);
     }

@@ -1,4 +1,4 @@
-export { CryptoStatsSDK } from './CryptoStatsSDK';
+export { NodeCryptoStatsSDK as CryptoStatsSDK } from './NodeCryptoStatsSDK';
 export type { Adapter } from './Adapter';
 export type { Context } from './Context';
 export type { List } from './List';

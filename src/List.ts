@@ -1,5 +1,5 @@
 import { Adapter } from './Adapter';
-import { CryptoStatsSDK } from './CryptoStatsSDK';
+import { BaseCryptoStatsSDK } from './BaseCryptoStatsSDK';
 import { SetupFn } from './types';
 import { Module } from './Module';
 
@@ -7,9 +7,9 @@ export class List {
   readonly name: string;
   readonly adapters: Adapter[] = [];
   private adaptersById: { [id: string]: Adapter } = {};
-  private sdk?: CryptoStatsSDK;
+  private sdk?: BaseCryptoStatsSDK;
 
-  constructor(name: string, sdk?: CryptoStatsSDK) {
+  constructor(name: string, sdk?: BaseCryptoStatsSDK) {
     this.name = name;
     this.sdk = sdk;
   }

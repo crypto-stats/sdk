@@ -1,7 +1,4 @@
 import { MemoryCache } from './caches/MemoryCache';
-import { MongoCache } from './caches/MongoCache';
-import { RedisCache } from './caches/RedisCache';
-import { MultiCache } from './caches/MultiCache';
 import { ChainData } from './libs/ChainData';
 import { CoinGecko } from './libs/CoinGecko';
 import { DateLib } from './libs/DateLib';
@@ -19,8 +16,8 @@ export interface CryptoStatsOptions {
   redisConnectionString?: string;
 }
 
-export class CryptoStatsSDK {
-  readonly cache: ICache;
+export abstract class BaseCryptoStatsSDK {
+  public cache: ICache;
   
   readonly coinGecko: CoinGecko;
   readonly chainData: ChainData;
@@ -37,19 +34,13 @@ export class CryptoStatsSDK {
     mongoConnectionString,
     redisConnectionString,
   }: CryptoStatsOptions = {}) {
+    // Ensure the cache is set. This should be overwritten, but the compiler likes it :)
+    this.cache = new MemoryCache();
+
     if (cache) {
       this.cache = cache;
-    } else if (mongoConnectionString || redisConnectionString) {
-      const caches: ICache[] = [new MemoryCache()];
-      if (redisConnectionString) {
-        caches.push(new RedisCache(redisConnectionString));
-      }
-      if (mongoConnectionString) {
-        caches.push(new MongoCache(mongoConnectionString));
-      }
-      this.cache = new MultiCache(caches);
     } else {
-      this.cache = new MemoryCache();
+      this.setupCache({ mongoConnectionString, redisConnectionString });
     }
 
     this.date = new DateLib();
@@ -59,6 +50,8 @@ export class CryptoStatsSDK {
     this.chainData = new ChainData({ graph: this.graph, cache: this.cache });
     this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache });
   }
+
+  protected abstract setupCache(params: { mongoConnectionString?: string; redisConnectionString?: string }): void;
 
   getList(name: string) {
     if (!this.lists[name]) {

@@ -21,6 +21,11 @@ describe('Module', function() {
     });
 
     const code = `
+      module.exports.name = 'Polymarket';
+      module.exports.version = '1.0.1';
+      module.exports.license = 'MIT';
+      module.exports.sourceFile = 'Qma...';
+
       module.exports.setup = function setup(context) {
         context.register({
           id: 'polymarket',
@@ -34,6 +39,12 @@ describe('Module', function() {
 
     const polymarketModule = new Module({ code, context });
     polymarketModule.evaluate();
+
+    expect(polymarketModule.name).to.equal('Polymarket');
+    expect(polymarketModule.version).to.equal('1.0.1');
+    expect(polymarketModule.license).to.equal('MIT');
+    expect(polymarketModule.sourceFile).to.equal('Qma...');
+
     polymarketModule.setup();
 
     const adapters = list.getAdapters();

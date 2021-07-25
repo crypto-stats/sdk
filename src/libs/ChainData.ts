@@ -9,8 +9,8 @@ interface ChainDataProps {
 export class ChainData {
   private graph: Graph;
   private cache: ICache;
-  blockNumLoaders: { [id: string]: (date: string) => Promise<number> } = {};
-  promiseCache: { [id: string]: Promise<number> } = {};
+  private blockNumLoaders: { [id: string]: (date: string) => Promise<number> } = {};
+  private promiseCache: { [id: string]: Promise<number> } = {};
 
   constructor({ graph, cache }: ChainDataProps) {
     this.graph = graph;

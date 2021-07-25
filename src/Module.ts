@@ -1,5 +1,4 @@
 import vm from 'vm'
-import { Adapter } from './Adapter'
 import { Context } from './Context'
 import { SetupFn } from './types';
 
@@ -7,15 +6,23 @@ interface ModuleProps {
   code?: string;
   setupFn?: SetupFn;
   context: Context;
+  name?: string;
+  version?: string;
+  license?: string;
+  sourceFile?: string;
 }
 
 export class Module {
+  name: string | null;
+  version: string | null;
+  license: string | null;
+  sourceFile: string | null;
+
   private code: string | null;
   private setupFn: SetupFn | null = null;
-  public adapters: Adapter[] = [];
   private context: Context;
 
-  constructor({ code, setupFn, context }: ModuleProps) {
+  constructor({ code, setupFn, context, name, version, license, sourceFile }: ModuleProps) {
     if (code && setupFn) {
       throw new Error('Can not provide code and setup function');
     }
@@ -24,6 +31,10 @@ export class Module {
     }
     this.code = code || null;
     this.setupFn = setupFn || null;
+    this.name = name || null;
+    this.version = version || null;
+    this.license = license || null;
+    this.sourceFile = sourceFile || null;
     this.context = context;
   }
 
@@ -45,6 +56,10 @@ export class Module {
       throw new Error('Adapter did not export a setup function')
     }
     this.setupFn = vmModule.exports.setup;
+    this.name = vmModule.exports.name || null;
+    this.version = vmModule.exports.version || null;
+    this.license = vmModule.exports.license || null;
+    this.sourceFile = vmModule.exports.sourceFile || null;
   }
 
   setup() {

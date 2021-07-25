@@ -1,4 +1,6 @@
 export { CryptoStatsSDK } from './CryptoStatsSDK';
+export type { Adapter } from './Adapter';
 export type { Context } from './Context';
 export type { List } from './List';
+export type { Module } from './Module';
 export type { SetupFn } from './types';

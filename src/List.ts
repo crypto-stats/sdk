@@ -58,6 +58,7 @@ export class List {
     const newModule = new Module({ code, context });
     newModule.evaluate();
     newModule.setup();
+    return newModule;
   }
 
   addAdaptersWithSetupFunction(setupFn: SetupFn) {
@@ -67,5 +68,6 @@ export class List {
     const context = this.sdk.getContext(this);
     const newModule = new Module({ setupFn, context });
     newModule.setup();
+    return newModule;
   }
 }

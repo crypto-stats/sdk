@@ -47,7 +47,7 @@ export abstract class BaseCryptoStatsSDK {
     this.http = new HTTP();
     this.ipfs = new IPFS({ gateway: ipfsGateway });
     this.graph = new Graph({ http: this.http });
-    this.chainData = new ChainData({ graph: this.graph, cache: this.cache });
+    this.chainData = new ChainData({ graph: this.graph, cache: this.cache, date: this.date });
     this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache });
   }
 

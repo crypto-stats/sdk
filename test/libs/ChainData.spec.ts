@@ -1,18 +1,21 @@
 import { expect } from 'chai';
 import { MemoryCache } from '../../src/caches/MemoryCache';
 import { ChainData } from '../../src/libs/ChainData';
+import { DateLib } from '../../src/libs/DateLib';
 import { Graph } from '../../src/libs/Graph';
 import { HTTP } from '../../src/libs/HTTP';
 
 describe('Graph', function() {
   let chainData = new ChainData({
     graph: new Graph({ http: new HTTP() }),
+    date: new DateLib(),
     cache: new MemoryCache(),
   });
 
   beforeEach(() => {
     chainData = new ChainData({
       graph: new Graph({ http: new HTTP() }),
+      date: new DateLib(),
       cache: new MemoryCache(),
     });
   });

@@ -1,19 +1,23 @@
 import { Graph } from './Graph';
+import { DateLib } from './DateLib';
 import { ICache } from '../types';
 
 interface ChainDataProps {
   graph: Graph;
   cache: ICache;
+  date: DateLib;
 }
 
 export class ChainData {
   private graph: Graph;
+  private date: DateLib;
   private cache: ICache;
   private blockNumLoaders: { [id: string]: (date: string) => Promise<number> } = {};
   private promiseCache: { [id: string]: Promise<number> } = {};
 
-  constructor({ graph, cache }: ChainDataProps) {
+  constructor({ graph, date, cache }: ChainDataProps) {
     this.graph = graph;
+    this.date = date;
     this.cache = cache;
 
     this.blockNumLoaders.ethereum = this.getBlockSubgraphQuery('blocklytics/ethereum-blocks');
@@ -74,7 +78,7 @@ export class ChainData {
   }
 
   async blockSubgraphQuery(subgraph: string, date: string) {
-    const time = Math.floor(new Date(date).getTime() / 1000);
+    const time = this.date.dateToTimestamp(date);
     const res = await this.graph.query(
       subgraph,
       `query blocks($timestampFrom: Int!, $timestampTo: Int!) {

@@ -24,7 +24,7 @@ export class ChainData {
     this.blockNumLoaders.polygon = this.getBlockSubgraphQuery('elkfinance/matic-blocks');
     this.blockNumLoaders.avalanche = this.getBlockSubgraphQuery('dasconnor/avalanche-blocks');
     this.blockNumLoaders.optimism = async (date: string) => {
-      const time = Math.floor(new Date(date).getTime() / 1000);
+      const time = this.date.dateToTimestamp(date);
       const res = await this.graph.query(
         'dmihal/optimism-fees',
         `query blocks($timestamp: String!) {

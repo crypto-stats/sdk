@@ -46,8 +46,37 @@ export class List {
     return Object.keys(this.adaptersById);
   }
 
-  async executeQuery(type: string, date: string) {
-    return Promise.all(this.adapters.map((adapter: Adapter) => adapter.executeQuery(type, date)));
+  async executeQuery(type: string, ...params: any[]) {
+    return Promise.all(this.adapters.map(async (adapter: Adapter) => ({
+      id: adapter.id,
+      result: adapter.executeQuery(type, ...params),
+    })));
+  }
+
+  async executeQueryWithMetadata(type: string, ...params: any[]) {
+    return Promise.all(this.adapters.map(async (adapter: Adapter) => {
+      const [result, metadata] = await Promise.all([
+        adapter.executeQuery(type, ...params),
+        adapter.getMetadata(),
+      ]);
+      return { id: adapter.id, result, metadata };
+    }))
+  }
+
+  async executeQueriesWithMetadata(types: string[], ...params: any[]) {
+    return Promise.all(this.adapters.map(async (adapter: Adapter) => {
+      const [metadata, ...resultsList] = await Promise.all([
+        adapter.getMetadata(),
+        ...types.map(type => adapter.executeQuery(type, ...params)),
+      ]);
+
+      const results: { [type: string]: any } = {};
+      types.forEach((type: string, index: number) => {
+        results[type] = resultsList[index];
+      });
+
+      return { id: adapter.id, results, metadata };
+    }))
   }
 
   addAdaptersWithCode(code: string) {

@@ -55,4 +55,20 @@ describe('Adapter', function() {
 
     expect(await adapter.query('fee', testDate)).to.equal(100);
   });
+
+  it('should execute adapters with arbitrary numbers of parameters', async function() {
+    const cache = new MemoryCache();
+    const adapter = new Adapter('polymarket', {
+      metadata: {},
+      cache: cache,
+    });
+
+    adapter.addQuery('0params', async () => 1);
+    adapter.addQuery('1param', async (a: number) => a * 2);
+    adapter.addQuery('2params', async (a: number, b: number) => a * b);
+
+    expect(await adapter.query('0params')).to.equal(1);
+    expect(await adapter.query('1param', 2)).to.equal(4);
+    expect(await adapter.query('2params', 2, 3)).to.equal(6);
+  });
 });

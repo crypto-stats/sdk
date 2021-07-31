@@ -5,11 +5,13 @@ interface AdapterProps {
   cache?: ICache | null;
 }
 
+type QueryFn<Output = any, Input = any> = (...params: Input[]) => Promise<Output>
+
 export class Adapter {
   readonly id: string;
   public metadata: any;
 
-  public queries: { [name: string]: (date: string) => Promise<number> } = {};
+  public queries: { [name: string]: (...params: any[]) => Promise<number> } = {};
   private cache: ICache | null;
 
   constructor(id: string, { metadata, cache }: AdapterProps) {
@@ -18,27 +20,28 @@ export class Adapter {
     this.cache = cache || null;
   }
 
-  addQuery(type: string, query: (date: string) => Promise<number>) {
+  addQuery(type: string, query: QueryFn) {
     this.queries[type] = query;
   }
 
-  async query(type: string, date: string) {
-    const cachedValue = await this.cache?.getValue(this.id, type, date);
+  async query(type: string, ...input: any[]) {
+    const inputSerialized = input.join('-');
+    const cachedValue = await this.cache?.getValue(this.id, type, inputSerialized);
     if (cachedValue) {
       return cachedValue;
     } else {
-      const result = await this.executeQuery(type, date);
-      await this.cache?.setValue(this.id, type, date, result);
+      const result = await this.executeQuery(type, ...input);
+      await this.cache?.setValue(this.id, type, inputSerialized, result);
       return result;
     }
   }
 
-  async executeQuery(type: string, date: string) {
+  async executeQuery(type: string, ...params: any[]) {
     if (!this.queries[type]) {
       throw new Error(`Adapter ${this.id} does not support ${type} queries`);
     }
 
-    const result = await this.queries[type](date);
+    const result = await this.queries[type](...params);
 
     return result;
   }

@@ -15,6 +15,13 @@ export class CoinGecko {
     this.http = http;
   }
 
+  async getCurrentPrice(name: string, currency = 'usd') {
+    const response = await this.http.get(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${name}&vs_currencies=${currency}`
+    );
+    return response[name][currency];
+  }
+
   async getHistoricalPrice(name: string, date: string) {
     if (name == 'usd') {
       return 1;

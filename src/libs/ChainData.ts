@@ -12,7 +12,7 @@ export class ChainData {
   private graph: Graph;
   private date: DateLib;
   private cache: ICache;
-  private blockNumLoaders: { [id: string]: (date: string) => Promise<number> } = {};
+  private blockNumLoaders: { [id: string]: (date: string | Date | number) => Promise<number> } = {};
   private promiseCache: { [id: string]: Promise<number> } = {};
 
   constructor({ graph, date, cache }: ChainDataProps) {
@@ -29,8 +29,8 @@ export class ChainData {
     this.blockNumLoaders.bsc = this.getBlockSubgraphQuery('generatefinance/bsc-blocks');
     this.blockNumLoaders.polygon = this.getBlockSubgraphQuery('elkfinance/matic-blocks');
     this.blockNumLoaders.avalanche = this.getBlockSubgraphQuery('dasconnor/avalanche-blocks');
-    this.blockNumLoaders.optimism = async (date: string) => {
-      const time = this.date.dateToTimestamp(date);
+    this.blockNumLoaders.optimism = async (date: string | Date | number) => {
+      const time = this.dateToTime(date);
       const res = await this.graph.query(
         'dmihal/optimism-fees',
         `query blocks($timestamp: String!) {
@@ -53,26 +53,32 @@ export class ChainData {
     };
   }
 
-  getBlockNumber(date: string, chain: string = 'ethereum') {
-    const key = `${chain}-${date}`;
+  getBlockNumber(date: string | number | Date, chain: string = 'ethereum') {
+    const key = `${chain}-${date.toString()}`;
     if (!this.promiseCache[key]) {
       this.promiseCache[key] = this.getBlockNumberInternal(date, chain);
     }
     return this.promiseCache[key];
   }
 
-  private async getBlockNumberInternal(date: string, chain: string) {
+  private async getBlockNumberInternal(date: string | number | Date, chain: string) {
+    const loader = this.blockNumLoaders[chain];
+    if (!loader) {
+      throw new Error(`Can't get block number for ${chain}`);
+    }
+
+    // We'll cache normal dates, but it doesn't make sense to cache arbitrary times
+    if (typeof date !== 'string') {
+      const block = await loader(date);
+      return block;
+    }
+
     const cachedValue = await this.cache.getValue(chain, 'block', date);
     if (cachedValue) {
       return cachedValue;
     }
 
     console.log(`Cache miss for block number for ${chain} on ${date}`);
-
-    const loader = this.blockNumLoaders[chain];
-    if (!loader) {
-      throw new Error(`Can't get block number for ${chain}`);
-    }
 
     const block = await loader(date);
 
@@ -82,11 +88,12 @@ export class ChainData {
   }
 
   getBlockSubgraphQuery(subgraph: string) {
-    return (date: string) => this.blockSubgraphQuery(subgraph, date);
+    return (date: string | Date | number) => this.blockSubgraphQuery(subgraph, date);
   }
 
-  async blockSubgraphQuery(subgraph: string, date: string) {
-    const time = this.date.dateToTimestamp(date);
+  async blockSubgraphQuery(subgraph: string, date: string | Date | number) {
+    const time = this.dateToTime(date);
+
     const res = await this.graph.query(
       subgraph,
       `query blocks($timestampFrom: Int!, $timestampTo: Int!) {
@@ -109,4 +116,15 @@ export class ChainData {
 
     return parseInt(res.blocks[0].number);
   };
+
+  private dateToTime(date: string | Date | number): number {
+    if (typeof date === 'string') {
+      return this.date.dateToTimestamp(date);      
+    } else if (typeof date === 'number') {
+      const JAN_1_2000 = 946684800000;
+      return date > JAN_1_2000 ? Math.floor(date / 1000) : date; // Convert ms to s
+    } else {
+      return Math.floor(date.getTime() / 1000);
+    }
+  }
 }

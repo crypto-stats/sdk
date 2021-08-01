@@ -26,6 +26,24 @@ describe('Graph', function() {
     expect(result).to.equal(11565020);
   });
 
+  it('should query using a date object', async () => {
+    const result = await chainData.getBlockNumber(new Date('2021-01-01T00:00:00.000Z'), 'ethereum');
+
+    expect(result).to.equal(11565020);
+  });
+
+  it('should query using a unix timestamp (ms)', async () => {
+    const result = await chainData.getBlockNumber(1609459200000, 'ethereum');
+
+    expect(result).to.equal(11565020);
+  });
+
+  it('should query using a unix timestamp (sec)', async () => {
+    const result = await chainData.getBlockNumber(1609459200, 'ethereum');
+
+    expect(result).to.equal(11565020);
+  });
+
   it('should query the Polygon block number', async () => {
     const result = await chainData.getBlockNumber('2021-01-01', 'polygon');
 

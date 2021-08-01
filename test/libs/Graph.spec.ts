@@ -16,12 +16,33 @@ describe('Graph', function() {
       }
     }`;
 
-    const result = await graph.query('dmihal/polygon-fees', query, { block: 500 }, 'invariant');
+    const result = await graph.query('dmihal/polygon-fees', query, {
+      variables: { block: 500 },
+      operationName: 'invariant',
+    });
 
     expect(result).to.deep.equal({
       fee: {
         totalFees: '0.000042',
       }
+    });
+  });
+
+  it('should query a different graph node', async () => {
+    const query = `{
+      ethburned(id:"1", block: { number: 5062700 }) {
+        burned
+      }
+    }`;
+
+    const result = await graph.query('dmihal/eth-burned', query, {
+      node: 'http://subgraph.ethburned.com:8000',
+    });
+
+    expect(result).to.deep.equal({
+      ethburned: {
+        burned: '38.642054456966080258',
+      },
     });
   });
 });

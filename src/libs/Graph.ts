@@ -4,6 +4,12 @@ interface GraphProps {
   http: HTTP;
 }
 
+interface Options {
+  variables?: any;
+  operationName?: string;
+  node?: string;
+}
+
 export class Graph {
   private http: HTTP;
 
@@ -14,10 +20,13 @@ export class Graph {
   async query(
     subgraph: string,
     query: string,
-    variables?: any,
-    operationName?: string
+    {
+      variables,
+      operationName,
+      node = 'https://api.thegraph.com',
+    }: Options = {}
   ): Promise<any> {
-    const response = await this.http.post(`https://api.thegraph.com/subgraphs/name/${subgraph}`, {
+    const response = await this.http.post(`${node}/subgraphs/name/${subgraph}`, {
         query,
         variables,
         operationName,

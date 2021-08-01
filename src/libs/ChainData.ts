@@ -21,6 +21,12 @@ export class ChainData {
     this.cache = cache;
 
     this.blockNumLoaders.ethereum = this.getBlockSubgraphQuery('blocklytics/ethereum-blocks');
+    this.blockNumLoaders.kovan = this.getBlockSubgraphQuery('blocklytics/kovan-blocks');
+    this.blockNumLoaders.goerli = this.getBlockSubgraphQuery('blocklytics/goerli-blocks');
+    this.blockNumLoaders.rinkeby = this.getBlockSubgraphQuery('blocklytics/rinkeby-blocks');
+    this.blockNumLoaders.xdai = this.getBlockSubgraphQuery('1hive/xdai-blocks');
+    this.blockNumLoaders.fantom = this.getBlockSubgraphQuery('0xfin/fantomblocks');
+    this.blockNumLoaders.bsc = this.getBlockSubgraphQuery('generatefinance/bsc-blocks');
     this.blockNumLoaders.polygon = this.getBlockSubgraphQuery('elkfinance/matic-blocks');
     this.blockNumLoaders.avalanche = this.getBlockSubgraphQuery('dasconnor/avalanche-blocks');
     this.blockNumLoaders.optimism = async (date: string) => {
@@ -33,7 +39,9 @@ export class ChainData {
           }
         }`,
         {
-          timestamp: time.toString(),
+          variables: {
+            timestamp: time.toString(),
+          },
         }
       );
 
@@ -92,9 +100,11 @@ export class ChainData {
         }
       }`,
       {
-        timestampFrom: time,
-        timestampTo: time + 60 * 60, // 1 hour window
-      }
+        variables: {
+          timestampFrom: time,
+          timestampTo: time + 60 * 60, // 1 hour window
+        },
+      },
     );
 
     return parseInt(res.blocks[0].number);

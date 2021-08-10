@@ -8,6 +8,12 @@ interface IPFSOptions {
   gateway?: string;
 }
 
+interface IPFSLoader {
+  (): Promise<string>;
+  cid: string;
+  mimeType: string;
+}
+
 export class IPFS {
   private client: IPFSClient;
 
@@ -42,7 +48,9 @@ export class IPFS {
     return `data:${mimeType};base64,${base64}`;
   }
 
-  getDataURILoader(cid: string | CID, mimeType: string) {
-    return () => this.getDataURI(cid, mimeType);
+  getDataURILoader(cid: string | CID, mimeType: string): IPFSLoader {
+    const fn = () => this.getDataURI(cid, mimeType);
+
+    return Object.assign(fn, { cid: cid.toString(), mimeType });
   }
 }

@@ -19,6 +19,9 @@ export class CoinGecko {
     const response = await this.http.get(
       `https://api.coingecko.com/api/v3/simple/price?ids=${name}&vs_currencies=${currency}`
     );
+    if (!response[name]) {
+      throw new Error(`${name} is not a valid CoinGecko ID`);
+    }
     return response[name][currency];
   }
 

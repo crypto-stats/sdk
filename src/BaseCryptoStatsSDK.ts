@@ -2,6 +2,7 @@ import { MemoryCache } from './caches/MemoryCache';
 import { ChainData } from './libs/ChainData';
 import { CoinGecko } from './libs/CoinGecko';
 import { DateLib } from './libs/DateLib';
+import { Ethers } from './libs/Ethers';
 import { IPFS } from './libs/IPFS';
 import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
@@ -12,6 +13,8 @@ import { ICache } from './types';
 export interface CryptoStatsOptions {
   ipfsGateway?: string;
   cache?: ICache;
+  infuraKey?: string;
+  moralisKey?: string;
   mongoConnectionString?: string;
   redisConnectionString?: string;
 }
@@ -22,6 +25,7 @@ export abstract class BaseCryptoStatsSDK {
   readonly coinGecko: CoinGecko;
   readonly chainData: ChainData;
   readonly date: DateLib;
+  readonly ethers: Ethers;
   readonly graph: Graph;
   readonly http: HTTP;
   readonly ipfs: IPFS;
@@ -31,6 +35,8 @@ export abstract class BaseCryptoStatsSDK {
   constructor({
     ipfsGateway,
     cache,
+    infuraKey,
+    moralisKey,
     mongoConnectionString,
     redisConnectionString,
   }: CryptoStatsOptions = {}) {
@@ -45,10 +51,28 @@ export abstract class BaseCryptoStatsSDK {
 
     this.date = new DateLib();
     this.http = new HTTP();
+    this.ethers = new Ethers();
     this.ipfs = new IPFS({ gateway: ipfsGateway });
     this.graph = new Graph({ http: this.http });
     this.chainData = new ChainData({ graph: this.graph, cache: this.cache, date: this.date });
     this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache });
+
+    if (moralisKey) {
+      const networks = ['mainnet', 'kovan', 'ropsten', 'goerli', 'rinkeby'];
+      for (const network of networks) {
+        const url = `https://speedy-nodes-nyc.moralis.io/${moralisKey}/eth/${network}/archive`;
+        this.ethers.addProvider(url, network === 'mainnet' ? 'ethereum' : network, { archive: true });
+      }
+      this.ethers.addProvider(`https://speedy-nodes-nyc.moralis.io/${moralisKey}/arbitrum/mainnet`, 'arbitrum');
+      this.ethers.addProvider(`https://speedy-nodes-nyc.moralis.io/${moralisKey}/polygon/mainnet/archive`, 'polygon', { archive: true });
+      this.ethers.addProvider(`https://speedy-nodes-nyc.moralis.io/${moralisKey}/bsc/mainnet/archive`, 'bsc', { archive: true });
+    } else if (infuraKey) {
+      const networks = ['mainnet', 'kovan', 'ropsten', 'goerli', 'rinkeby'];
+      for (const network of networks) {
+        const url = `https://${network}.infura.io/v3/${infuraKey}`;
+        this.ethers.addProvider(url, network === 'mainnet' ? 'ethereum' : network);
+      }
+    }
   }
 
   protected abstract setupCache(params: { mongoConnectionString?: string; redisConnectionString?: string }): void;

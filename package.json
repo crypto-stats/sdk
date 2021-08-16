@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "date-fns": "^2.22.1",
+    "ethers": "^5.4.4",
     "ipfs-http-client": "^49.0.4",
     "isomorphic-fetch": "^3.0.0",
     "it-all": "^1.0.5",

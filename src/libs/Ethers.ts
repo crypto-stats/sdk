@@ -1,18 +1,34 @@
 import { ethers } from 'ethers';
+import { BlockTag } from '@ethersproject/abstract-provider';
+import { ChainData } from './ChainData';
 
 class Provider extends ethers.providers.JsonRpcProvider {
   public isArchive: boolean;
+  private chainData: ChainData;
+  private id: string;
 
-  constructor(url: string, archive: boolean) {
+  constructor(url: string, id: string, archive: boolean, chainData: ChainData) {
     super(url);
     this.isArchive = archive;
+    this.id = id;
+    this.chainData = chainData;
   }
 
-  send(method: string, params: any[]) {
-    if (method === 'eth_call' && params[0].blockTag && !this.isArchive) {
-      throw new Error(`Unable to call ${params[0].to} on block ${params[0].blockTag}: provider is not archive node`);
+  async _getBlockTag(blockTag: BlockTag | Promise<BlockTag>): Promise<BlockTag> {
+    blockTag = await blockTag;
+
+    if (blockTag) {
+      if (!this.isArchive) {
+        throw new Error(`Unable to query by blockTag: provider is not archive node`);
+      }
+
+
+      if (/\d{4}-\d{2}-\d{2}/.test(blockTag.toString())) {
+        return this.chainData.getBlockNumber(blockTag as string, this.id);
+      }
     }
-    return super.send(method, params);
+
+    return super._getBlockTag(blockTag);
   }
 }
 
@@ -36,7 +52,12 @@ interface ProviderData {
 }
 
 export class Ethers {
+  private chainData: ChainData;
   private providersByNetwork: { [network: string]: ProviderData } = {};
+
+  constructor({ chainData }: { chainData: ChainData }) {
+    this.chainData = chainData;
+  }
 
   addProvider(name: string, url: string, {
     archive = false,
@@ -60,7 +81,7 @@ export class Ethers {
       throw new Error(`Network ${network} is not available`);
     }
     if (!providerData.provider) {
-      providerData.provider = new Provider(providerData.url, providerData.archive);
+      providerData.provider = new Provider(providerData.url, network, providerData.archive, this.chainData);
     }
     return providerData.provider;
   }

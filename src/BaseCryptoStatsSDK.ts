@@ -51,10 +51,10 @@ export abstract class BaseCryptoStatsSDK {
 
     this.date = new DateLib();
     this.http = new HTTP();
-    this.ethers = new Ethers();
     this.ipfs = new IPFS({ gateway: ipfsGateway });
     this.graph = new Graph({ http: this.http });
     this.chainData = new ChainData({ graph: this.graph, cache: this.cache, date: this.date });
+    this.ethers = new Ethers({ chainData: this.chainData });
     this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache });
 
     if (moralisKey) {

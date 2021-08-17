@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers, utils, BigNumber, FixedNumber } from 'ethers';
 import { BlockTag } from '@ethersproject/abstract-provider';
 import { ChainData } from './ChainData';
 
@@ -52,11 +52,18 @@ interface ProviderData {
 }
 
 export class Ethers {
+  public utils: typeof utils;
+  public BigNumber: typeof BigNumber;
+  public FixedNumber: typeof FixedNumber;
+
   private chainData: ChainData;
   private providersByNetwork: { [network: string]: ProviderData } = {};
 
   constructor({ chainData }: { chainData: ChainData }) {
     this.chainData = chainData;
+    this.utils = utils;
+    this.BigNumber = BigNumber;
+    this.FixedNumber = FixedNumber;
   }
 
   addProvider(name: string, url: string, {

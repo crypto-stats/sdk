@@ -61,16 +61,16 @@ export abstract class BaseCryptoStatsSDK {
       const networks = ['mainnet', 'kovan', 'ropsten', 'goerli', 'rinkeby'];
       for (const network of networks) {
         const url = `https://speedy-nodes-nyc.moralis.io/${moralisKey}/eth/${network}/archive`;
-        this.ethers.addProvider(url, network === 'mainnet' ? 'ethereum' : network, { archive: true });
+        this.ethers.addProvider(network === 'mainnet' ? 'ethereum' : network, url, { archive: true });
       }
-      this.ethers.addProvider(`https://speedy-nodes-nyc.moralis.io/${moralisKey}/arbitrum/mainnet`, 'arbitrum');
-      this.ethers.addProvider(`https://speedy-nodes-nyc.moralis.io/${moralisKey}/polygon/mainnet/archive`, 'polygon', { archive: true });
-      this.ethers.addProvider(`https://speedy-nodes-nyc.moralis.io/${moralisKey}/bsc/mainnet/archive`, 'bsc', { archive: true });
+      this.ethers.addProvider('arbitrum', `https://speedy-nodes-nyc.moralis.io/${moralisKey}/arbitrum/mainnet`);
+      this.ethers.addProvider('polygon', `https://speedy-nodes-nyc.moralis.io/${moralisKey}/polygon/mainnet/archive`, { archive: true });
+      this.ethers.addProvider('bsc', `https://speedy-nodes-nyc.moralis.io/${moralisKey}/bsc/mainnet/archive`, { archive: true });
     } else if (infuraKey) {
       const networks = ['mainnet', 'kovan', 'ropsten', 'goerli', 'rinkeby'];
       for (const network of networks) {
         const url = `https://${network}.infura.io/v3/${infuraKey}`;
-        this.ethers.addProvider(url, network === 'mainnet' ? 'ethereum' : network);
+        this.ethers.addProvider(network === 'mainnet' ? 'ethereum' : network, url);
       }
     }
   }

@@ -1,6 +1,7 @@
 import { ChainData } from './libs/ChainData';
 import { CoinGecko } from './libs/CoinGecko';
 import { DateLib } from './libs/DateLib';
+import { Ethers } from './libs/Ethers';
 import { IPFS } from './libs/IPFS';
 import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
@@ -19,6 +20,7 @@ interface ContextProps {
   graph: Graph;
   http: HTTP;
   ipfs: IPFS;
+  ethers: Ethers;
   list: List;
 }
 
@@ -29,6 +31,7 @@ export class Context {
   readonly graph: Graph;
   readonly http: HTTP;
   readonly ipfs: IPFS;
+  readonly ethers: Ethers;
 
   private list: List;
 
@@ -39,6 +42,7 @@ export class Context {
     graph,
     http,
     ipfs,
+    ethers,
     list,
   }: ContextProps) {
     this.coinGecko = coinGecko;
@@ -47,6 +51,7 @@ export class Context {
     this.graph = graph;
     this.http = http;
     this.ipfs = ipfs;
+    this.ethers = ethers;
 
     this.list = list;
   }

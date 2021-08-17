@@ -92,6 +92,7 @@ export abstract class BaseCryptoStatsSDK {
       graph: this.graph,
       http: this.http,
       ipfs: this.ipfs,
+      ethers: this.ethers,
       list,
     });
     return context;

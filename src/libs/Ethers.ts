@@ -24,7 +24,7 @@ class Provider extends ethers.providers.JsonRpcProvider {
 
 
       if (/\d{4}-\d{2}-\d{2}/.test(blockTag.toString())) {
-        return this.chainData.getBlockNumber(blockTag as string, this.id);
+        blockTag = await this.chainData.getBlockNumber(blockTag as string, this.id);
       }
     }
 

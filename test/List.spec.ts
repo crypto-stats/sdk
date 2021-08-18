@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { Adapter } from '../src/Adapter';
+import { BaseCryptoStatsSDK } from '../src/BaseCryptoStatsSDK';
 import { List } from '../src/List';
 import { MemoryCache } from '../src/caches/MemoryCache';
 
@@ -69,5 +70,48 @@ describe('List', function() {
     expect(result[0].metadata).to.deep.equal({
       icon: 'img',
     });
+  });
+
+  it('should fetch modules', async function() {
+    const sdk = {
+      http: {
+        async get(url: string) {
+          expect(url).to.equal('https://cryptostats.community/api/list/test');
+          return { success: true, result: ['myCID'] };
+        }
+      },
+      ipfs: {
+        getFile(cid: string) {
+          expect(cid).to.equal('myCID');
+          return `
+      module.exports.name = 'Polymarket';
+      module.exports.version = '1.0.1';
+
+      module.exports.setup = function setup(context) {
+        context.register({
+          id: 'polymarket',
+          metadata: {
+            name: 'Polymarket',
+          },
+        });
+      }
+    `;
+        },
+      },
+      getContext(_list: List) {
+        return {
+          register(registration: any) {
+            _list.addAdapter(registration);
+          }
+        };
+      },
+    } as unknown as BaseCryptoStatsSDK;
+
+    const list = new List('test', sdk);
+
+    await list.fetchAdapters();
+
+    expect(list.adapters.length).to.equal(1);
+    expect(list.adapters[0].id).to.equal('polymarket');
   });
 });

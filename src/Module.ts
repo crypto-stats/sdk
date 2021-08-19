@@ -10,6 +10,7 @@ interface ModuleProps {
   version?: string;
   license?: string;
   sourceFile?: string;
+  executionTimeout?: number;
 }
 
 export class Module {
@@ -21,8 +22,9 @@ export class Module {
   private code: string | null;
   private setupFn: SetupFn | null = null;
   private context: Context;
+  private executionTimeout: number;
 
-  constructor({ code, setupFn, context, name, version, license, sourceFile }: ModuleProps) {
+  constructor({ code, setupFn, context, name, version, license, sourceFile, executionTimeout = 30 }: ModuleProps) {
     if (code && setupFn) {
       throw new Error('Can not provide code and setup function');
     }
@@ -36,6 +38,7 @@ export class Module {
     this.license = license || null;
     this.sourceFile = sourceFile || null;
     this.context = context;
+    this.executionTimeout = executionTimeout;
   }
 
   evaluate() {
@@ -76,7 +79,7 @@ export class Module {
     script.runInContext(vmContext, {
       // Keep this short, since the execution should only be exporting some variables
       // If scripts are timing out, this can be increased
-      timeout: 10,
+      timeout: this.executionTimeout,
     });
 
     if (!vmModule.exports.setup) {

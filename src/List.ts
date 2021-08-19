@@ -97,7 +97,7 @@ export class List {
       throw new Error('SDK not set');
     }
     const context = this.sdk.getContext(this);
-    const newModule = new Module({ code, context });
+    const newModule = new Module({ code, context, executionTimeout: this.sdk.executionTimeout });
     newModule.evaluate();
     newModule.setup();
     return newModule;
@@ -108,7 +108,7 @@ export class List {
       throw new Error('SDK not set');
     }
     const context = this.sdk.getContext(this);
-    const newModule = new Module({ setupFn, context });
+    const newModule = new Module({ setupFn, context, executionTimeout: this.sdk.executionTimeout });
     newModule.setup();
     return newModule;
   }

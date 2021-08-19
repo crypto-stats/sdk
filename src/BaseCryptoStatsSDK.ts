@@ -17,6 +17,7 @@ export interface CryptoStatsOptions {
   moralisKey?: string;
   mongoConnectionString?: string;
   redisConnectionString?: string;
+  executionTimeout?: number;
 }
 
 export abstract class BaseCryptoStatsSDK {
@@ -30,6 +31,8 @@ export abstract class BaseCryptoStatsSDK {
   readonly http: HTTP;
   readonly ipfs: IPFS;
 
+  readonly executionTimeout: number;
+
   private lists: { [name: string]: List } = {};
 
   constructor({
@@ -39,7 +42,10 @@ export abstract class BaseCryptoStatsSDK {
     moralisKey,
     mongoConnectionString,
     redisConnectionString,
+    executionTimeout = 30,
   }: CryptoStatsOptions = {}) {
+    this.executionTimeout = executionTimeout;
+
     // Ensure the cache is set. This should be overwritten, but the compiler likes it :)
     this.cache = new MemoryCache();
 

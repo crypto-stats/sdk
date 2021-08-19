@@ -97,4 +97,37 @@ describe('Module', function() {
       icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgiIGhlaWdodD0iMzYiIHZpZXdCb3g9IjAgMCAyOCAzNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTI2LjUxOSAzMy4yMjQyTDEuNDQ3NzUgMjYuMDYxVjkuOTQzODVMMjYuNTE5IDE3LjEwN1YzMy4yMjQyWiIgc3Ryb2tlPSIjMDEwMjAyIiBzdHJva2Utd2lkdGg9IjIuNjg2MiIvPgo8cGF0aCBkPSJNMjYuNTE5IDEuODg1MjVMMS40NDc3NSA5LjA0ODQ1VjI1LjE2NTdMMjYuNTE5IDE4LjAwMjVWMS44ODUyNVoiIHN0cm9rZT0iIzAxMDIwMiIgc3Ryb2tlLXdpZHRoPSIyLjY4NjIiLz4KPC9zdmc+Cg==',
     });
   });
+
+  it('should not allow escaping the sandbox using constructors', () => {
+    const ipfs = new IPFS();
+    const list = new List('fees');
+    const context = new Context({
+      coinGecko: {} as any,
+      chainData: {} as any,
+      date: {} as any,
+      graph: {} as any,
+      http: {} as any,
+      ethers: {} as any,
+      ipfs,
+      list,
+    });
+
+    const fail: any = () => {
+      throw new Error('Escaped sandbox');
+    };
+    // @ts-ignore
+    global.fail = fail;
+
+    const code = `
+      let fail;
+      try {
+        fail = this.constructor.constructor('return this.fail')();
+      } catch (e) { /* Unable to escape */ }
+      fail && fail();
+      module.exports.setup = function() {} // to prevent other error
+    `;
+
+    const polymarketModule = new Module({ code, context });
+    polymarketModule.evaluate();
+  });
 });

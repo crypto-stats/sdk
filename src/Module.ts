@@ -43,11 +43,34 @@ export class Module {
       throw new Error('Can not evaluate, setup function already set');
     }
 
-    const vmModule: any = { exports: {} };
+    // Node VMs are dangerous! We jump through a bunch of hoops to sandbox the script
+    // Really, we should be using a tested package like VM2, however they don't support
+    // client-side execution.
+
+    const base = {};
+    const handler = {
+      get(target: any, key: string) {
+        if (key === 'constructor') {
+          return Object;
+        }
+        if (key === '__proto__') {
+          return Object.prototype;
+        }
+
+        return target[key];
+      },
+    }
+
+    const vmExports = new Proxy(base, handler);
+    const vmModule = new Proxy({ exports: vmExports }, handler);
+
     const vmContext = vm.createContext({
       exports: vmModule.exports,
       module: vmModule
     });
+    // @ts-ignore
+    vmContext.constructor = null;
+
     const script = new vm.Script(this.code);
 
     script.runInContext(vmContext, {

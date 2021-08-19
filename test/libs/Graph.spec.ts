@@ -30,18 +30,18 @@ describe('Graph', function() {
 
   it('should query a different graph node', async () => {
     const query = `{
-      ethburned(id:"1", block: { number: 5062700 }) {
+      ethburned(id:"1", block: { number: 13054993 }) {
         burned
       }
     }`;
 
     const result = await graph.query('dmihal/eth-burned', query, {
-      node: 'http://subgraph.ethburned.com:8000',
+      node: 'http://subgraph.ethburned.com',
     });
 
     expect(result).to.deep.equal({
       ethburned: {
-        burned: '38.642054456966080258',
+        burned: '63688.35641002801501576',
       },
     });
   });

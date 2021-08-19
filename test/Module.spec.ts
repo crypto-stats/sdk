@@ -16,6 +16,7 @@ describe('Module', function() {
       date: {} as any,
       graph: {} as any,
       http: {} as any,
+      ethers: {} as any,
       ipfs,
       list,
     });
@@ -68,6 +69,7 @@ describe('Module', function() {
       date: {} as any,
       graph: {} as any,
       http: {} as any,
+      ethers: {} as any,
       ipfs,
       list,
     });

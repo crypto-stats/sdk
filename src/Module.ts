@@ -50,7 +50,11 @@ export class Module {
     });
     const script = new vm.Script(this.code);
 
-    script.runInContext(vmContext);
+    script.runInContext(vmContext, {
+      // Keep this short, since the execution should only be exporting some variables
+      // If scripts are timing out, this can be increased
+      timeout: 10,
+    });
 
     if (!vmModule.exports.setup) {
       throw new Error('Adapter did not export a setup function')

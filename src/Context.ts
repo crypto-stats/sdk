@@ -5,6 +5,7 @@ import { Ethers } from './libs/Ethers';
 import { IPFS } from './libs/IPFS';
 import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
+import { Plugins } from './libs/Plugins';
 import { List } from './List';
 
 interface RegistrationData {
@@ -17,10 +18,11 @@ interface ContextProps {
   coinGecko: CoinGecko;
   chainData: ChainData;
   date: DateLib;
+  ethers: Ethers;
   graph: Graph;
   http: HTTP;
   ipfs: IPFS;
-  ethers: Ethers;
+  plugins: Plugins;
   list: List;
 }
 
@@ -28,10 +30,11 @@ export class Context {
   readonly coinGecko: CoinGecko;
   readonly chainData: ChainData;
   readonly date: DateLib;
+  readonly ethers: Ethers;
   readonly graph: Graph;
   readonly http: HTTP;
   readonly ipfs: IPFS;
-  readonly ethers: Ethers;
+  readonly plugins: Plugins;
 
   private list: List;
 
@@ -43,6 +46,7 @@ export class Context {
     http,
     ipfs,
     ethers,
+    plugins,
     list,
   }: ContextProps) {
     this.coinGecko = coinGecko;
@@ -52,6 +56,7 @@ export class Context {
     this.http = http;
     this.ipfs = ipfs;
     this.ethers = ethers;
+    this.plugins = plugins;
 
     this.list = list;
   }

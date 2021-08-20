@@ -6,6 +6,7 @@ import { Ethers } from './libs/Ethers';
 import { IPFS } from './libs/IPFS';
 import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
+import { Plugins } from './libs/Plugins';
 import { Context } from './Context';
 import { List } from './List';
 import { ICache } from './types';
@@ -30,6 +31,7 @@ export abstract class BaseCryptoStatsSDK {
   readonly graph: Graph;
   readonly http: HTTP;
   readonly ipfs: IPFS;
+  readonly plugins: Plugins;
 
   readonly executionTimeout: number;
 
@@ -55,6 +57,7 @@ export abstract class BaseCryptoStatsSDK {
       this.setupCache({ mongoConnectionString, redisConnectionString });
     }
 
+    this.plugins = new Plugins();
     this.date = new DateLib();
     this.http = new HTTP();
     this.ipfs = new IPFS({ gateway: ipfsGateway });
@@ -99,6 +102,7 @@ export abstract class BaseCryptoStatsSDK {
       http: this.http,
       ipfs: this.ipfs,
       ethers: this.ethers,
+      plugins: this.plugins,
       list,
     });
     return context;

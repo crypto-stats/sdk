@@ -10,7 +10,7 @@ import { List } from './List';
 
 interface RegistrationData {
   id: string;
-  queries: { [name: string]: (date: string) => Promise<number> };
+  queries: { [name: string]: (date: string) => Promise<any> };
   metadata: any;
 }
 

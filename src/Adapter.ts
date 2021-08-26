@@ -50,7 +50,7 @@ export class Adapter {
     const metadata = { ...this.metadata };
 
     await Promise.all(Object.entries(metadata).map(async ([key, val]: [string, any]) => {
-      if (val.then) {
+      if (val?.then) {
         metadata[key] = await val;
       } else if (typeof(val) === 'function') {
         const promiseOrResult = val();

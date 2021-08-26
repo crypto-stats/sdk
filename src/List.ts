@@ -49,7 +49,7 @@ export class List {
   async executeQuery(type: string, ...params: any[]) {
     return Promise.all(this.adapters.map(async (adapter: Adapter) => ({
       id: adapter.id,
-      result: adapter.executeQuery(type, ...params),
+      result: await adapter.executeQuery(type, ...params),
     })));
   }
 

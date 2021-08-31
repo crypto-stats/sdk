@@ -71,4 +71,14 @@ describe('Adapter', function() {
     expect(await adapter.query('1param', 2)).to.equal(4);
     expect(await adapter.query('2params', 2, 3)).to.equal(6);
   });
+
+  it('should optionally allow silently allowing missing queries', async function() {
+    const cache = new MemoryCache();
+    const adapter = new Adapter('polymarket', {
+      metadata: {},
+      cache: cache,
+    });
+
+    expect(await adapter.query('missingQuery', { allowMissingQuery: true })).to.be.null;
+  });
 });

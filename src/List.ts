@@ -49,14 +49,14 @@ export class List {
   async executeQuery(type: string, ...params: any[]) {
     return Promise.all(this.adapters.map(async (adapter: Adapter) => ({
       id: adapter.id,
-      result: await adapter.executeQuery(type, ...params),
+      result: await adapter.query(type, ...params),
     })));
   }
 
   async executeQueryWithMetadata(type: string, ...params: any[]) {
     return Promise.all(this.adapters.map(async (adapter: Adapter) => {
       const [result, metadata] = await Promise.all([
-        adapter.executeQuery(type, ...params),
+        adapter.query(type, ...params),
         adapter.getMetadata(),
       ]);
       return { id: adapter.id, result, metadata };
@@ -67,7 +67,7 @@ export class List {
     return Promise.all(this.adapters.map(async (adapter: Adapter) => {
       const [metadata, ...resultsList] = await Promise.all([
         adapter.getMetadata(),
-        ...types.map(type => adapter.executeQuery(type, ...params)),
+        ...types.map(type => adapter.query(type, ...params)),
       ]);
 
       const results: { [type: string]: any } = {};

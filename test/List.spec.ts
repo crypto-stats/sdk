@@ -114,4 +114,16 @@ describe('List', function() {
     expect(list.adapters.length).to.equal(1);
     expect(list.adapters[0].id).to.equal('polymarket');
   });
+
+  it('should optionally allow silently allowing missing queries', async function() {
+    const list = new List('test');
+    list.addAdapter({ id: 'test1', queries: { test: () => 1}, metadata: {} });
+    list.addAdapter({ id: 'test2', queries: {}, metadata: {} });
+
+    const result = await list.executeQuery('test', { allowMissingQuery: true });
+    expect(result).to.deep.equal([
+      { id: 'test1', result: 1 },
+      { id: 'test2', result: null },
+    ]);
+  });
 });

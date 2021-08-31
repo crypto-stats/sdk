@@ -25,12 +25,23 @@ export class Adapter {
   }
 
   async query(type: string, ...input: any[]) {
-    const inputSerialized = input.join('-');
+    let _input = input;
+    let allowMissingQuery = false;
+    if (input.length > 0 && input[input.length - 1].allowMissingQuery) {
+      _input = input.slice(0, -1);
+      allowMissingQuery = true;
+    }
+
+    if (allowMissingQuery && !this.queries[type]) {
+      return null;
+    }
+
+    const inputSerialized = _input.join('-');
     const cachedValue = await this.cache?.getValue(this.id, type, inputSerialized);
     if (cachedValue) {
       return cachedValue;
     } else {
-      const result = await this.executeQuery(type, ...input);
+      const result = await this.executeQuery(type, ..._input);
       await this.cache?.setValue(this.id, type, inputSerialized, result);
       return result;
     }

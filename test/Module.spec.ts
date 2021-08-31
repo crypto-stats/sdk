@@ -17,6 +17,7 @@ describe('Module', function() {
       graph: {} as any,
       http: {} as any,
       ethers: {} as any,
+      plugins: {} as any,
       ipfs,
       list,
     });
@@ -70,6 +71,7 @@ describe('Module', function() {
       graph: {} as any,
       http: {} as any,
       ethers: {} as any,
+      plugins: {} as any,
       ipfs,
       list,
     });
@@ -108,6 +110,7 @@ describe('Module', function() {
       graph: {} as any,
       http: {} as any,
       ethers: {} as any,
+      plugins: {} as any,
       ipfs,
       list,
     });

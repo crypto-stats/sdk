@@ -18,7 +18,7 @@ export class IPFS {
   private client: IPFSClient;
 
   constructor({
-    gateway = 'https://ipfs.io',
+    gateway = 'https://ipfs.cryptostats.community',
   }: IPFSOptions = {}) {
     this.client = ipfsClient({ url: gateway }) as IPFSClient;
   }

@@ -3,6 +3,7 @@ import { ICache } from './types';
 interface AdapterProps {
   metadata: any;
   cache?: ICache | null;
+  bundle?: string | null;
 }
 
 type QueryFn<Output = any, Input = any> = (...params: Input[]) => Promise<Output>
@@ -10,14 +11,16 @@ type QueryFn<Output = any, Input = any> = (...params: Input[]) => Promise<Output
 export class Adapter {
   readonly id: string;
   public metadata: any;
+  readonly bundle: string | null;
 
   public queries: { [name: string]: (...params: any[]) => Promise<number> } = {};
   private cache: ICache | null;
 
-  constructor(id: string, { metadata, cache }: AdapterProps) {
+  constructor(id: string, { metadata, cache, bundle }: AdapterProps) {
     this.id = id;
     this.metadata = metadata;
     this.cache = cache || null;
+    this.bundle = bundle || null;
   }
 
   addQuery(type: string, query: QueryFn) {

@@ -64,4 +64,8 @@ export class Context {
   register(registration: RegistrationData) {
     this.list.addAdapter(registration);
   }
+
+  registerBundle(id: string) {
+    this.list.addBundle(id);
+  }
 }

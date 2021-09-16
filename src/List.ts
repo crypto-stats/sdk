@@ -3,9 +3,17 @@ import { BaseCryptoStatsSDK } from './BaseCryptoStatsSDK';
 import { SetupFn } from './types';
 import { Module } from './Module';
 
+interface AdapterData {
+  id: string;
+  queries: any;
+  metadata: any;
+  bundle?: string | null;
+}
+
 export class List {
   readonly name: string;
   readonly adapters: Adapter[] = [];
+  readonly bundles: string[] = [];
   private adaptersById: { [id: string]: Adapter } = {};
   private sdk?: BaseCryptoStatsSDK;
 
@@ -16,7 +24,7 @@ export class List {
     this.sdk = sdk;
   }
 
-  addAdapter({ id, queries, metadata }: { id: string; queries: any; metadata: any }) {
+  addAdapter({ id, queries, metadata, bundle }: AdapterData) {
     if (this.adaptersById[id]) {
       throw new Error(`Adapter '${id}' already added`);
     }
@@ -24,7 +32,12 @@ export class List {
     const adapter = new Adapter(id, {
       metadata,
       cache: this.sdk?.cache,
+      bundle,
     });
+
+    if (bundle && this.bundles.indexOf(bundle) === -1) {
+      this.bundles.push(bundle);
+    }
 
     for (let name in queries) {
       adapter.addQuery(name, queries[name]);
@@ -34,6 +47,14 @@ export class List {
     this.adaptersById[id] = adapter;
 
     return adapter;
+  }
+
+  addBundle(id: string) {
+    if (this.bundles.indexOf(id) !== -1) {
+      throw new Error(`Bundle ${id} already exists`);
+    }
+
+    this.bundles.push(id);
   }
 
   getAdapters() {
@@ -51,6 +72,7 @@ export class List {
   async executeQuery(type: string, ...params: any[]) {
     return Promise.all(this.adapters.map(async (adapter: Adapter) => ({
       id: adapter.id,
+      bundle: adapter.bundle,
       result: await adapter.query(type, ...params),
     })));
   }
@@ -61,7 +83,12 @@ export class List {
         adapter.query(type, ...params),
         adapter.getMetadata(),
       ]);
-      return { id: adapter.id, result, metadata };
+      return {
+        id: adapter.id,
+        bundle: adapter.bundle,
+        result,
+        metadata,
+      };
     }))
   }
 
@@ -77,7 +104,12 @@ export class List {
         results[type] = resultsList[index];
       });
 
-      return { id: adapter.id, results, metadata };
+      return {
+        id: adapter.id,
+        results,
+        metadata,
+        bundle: adapter.bundle,
+      };
     }))
   }
 

@@ -90,6 +90,7 @@ describe('List', function() {
       module.exports.setup = function setup(context) {
         context.register({
           id: 'polymarket',
+          bundle: 'my-bundle',
           metadata: {
             name: 'Polymarket',
           },
@@ -113,6 +114,8 @@ describe('List', function() {
 
     expect(list.adapters.length).to.equal(1);
     expect(list.adapters[0].id).to.equal('polymarket');
+    expect(list.adapters[0].bundle).to.equal('my-bundle');
+    expect(list.bundles).to.deep.equal(['my-bundle']);
   });
 
   it('should skip fetching a second time', async function() {
@@ -165,8 +168,8 @@ describe('List', function() {
 
     const result = await list.executeQuery('test', { allowMissingQuery: true });
     expect(result).to.deep.equal([
-      { id: 'test1', result: 1 },
-      { id: 'test2', result: null },
+      { id: 'test1', result: 1, bundle: null },
+      { id: 'test2', result: null, bundle: null },
     ]);
   });
 });

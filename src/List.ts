@@ -9,6 +9,8 @@ export class List {
   private adaptersById: { [id: string]: Adapter } = {};
   private sdk?: BaseCryptoStatsSDK;
 
+  private adaptersFetched = false;
+
   constructor(name: string, sdk?: BaseCryptoStatsSDK) {
     this.name = name;
     this.sdk = sdk;
@@ -83,12 +85,18 @@ export class List {
     if (!this.sdk) {
       throw new Error('SDK not set');
     }
+    if (this.adaptersFetched) {
+      console.warn(`Adapters for ${this.name} already fetched, skipping`);
+      return;
+    }
+
     const response = await this.sdk.http.get(`https://cryptostats.community/api/list/${this.name}`);
 
     const adapters: string[] = await Promise.all(
       response.result.map((cid: string) => this.sdk!.ipfs.getFile(cid)));
 
     const modules = adapters.map(adapter => this.addAdaptersWithCode(adapter));
+    this.adaptersFetched = true;
     return modules;
   }
 

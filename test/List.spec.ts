@@ -115,6 +115,49 @@ describe('List', function() {
     expect(list.adapters[0].id).to.equal('polymarket');
   });
 
+  it('should skip fetching a second time', async function() {
+    let fetchedOnce = false;
+    const sdk = {
+      http: {
+        async get(url: string) {
+          if (fetchedOnce) {
+            throw new Error("Shouldn't fetch a second time");
+          }
+          expect(url).to.equal('https://cryptostats.community/api/list/test');
+          return { success: true, result: ['myCID'] };
+        }
+      },
+      ipfs: {
+        getFile(cid: string) {
+          expect(cid).to.equal('myCID');
+          return `
+      module.exports.name = 'Polymarket';
+
+      module.exports.setup = function setup(context) {
+        context.register({ id: 'polymarket', metadata: {} });
+      }
+    `;
+        },
+      },
+      getContext(_list: List) {
+        return {
+          register(registration: any) {
+            _list.addAdapter(registration);
+          }
+        };
+      },
+    } as unknown as BaseCryptoStatsSDK;
+
+    const list = new List('test', sdk);
+
+    await list.fetchAdapters();
+    fetchedOnce = true;
+    await list.fetchAdapters();
+
+    expect(list.adapters.length).to.equal(1);
+    expect(list.adapters[0].id).to.equal('polymarket');
+  });
+
   it('should optionally allow silently allowing missing queries', async function() {
     const list = new List('test');
     list.addAdapter({ id: 'test1', queries: { test: () => 1}, metadata: {} });

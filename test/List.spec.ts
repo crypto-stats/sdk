@@ -4,6 +4,21 @@ import { BaseCryptoStatsSDK } from '../src/BaseCryptoStatsSDK';
 import { List } from '../src/List';
 import { MemoryCache } from '../src/caches/MemoryCache';
 
+const POLYGON_MODULE_CODE = `
+  module.exports.name = 'Polymarket';
+  module.exports.version = '1.0.1';
+
+  module.exports.setup = function setup(context) {
+    context.register({
+      id: 'polymarket',
+      bundle: 'my-bundle',
+      metadata: {
+        name: 'Polymarket',
+      },
+    });
+  }
+`;
+
 describe('List', function() {
   it('should execute a single query', async function () {
     const list = new List('test');
@@ -83,20 +98,7 @@ describe('List', function() {
       ipfs: {
         getFile(cid: string) {
           expect(cid).to.equal('myCID');
-          return `
-      module.exports.name = 'Polymarket';
-      module.exports.version = '1.0.1';
-
-      module.exports.setup = function setup(context) {
-        context.register({
-          id: 'polymarket',
-          bundle: 'my-bundle',
-          metadata: {
-            name: 'Polymarket',
-          },
-        });
-      }
-    `;
+          return POLYGON_MODULE_CODE;
         },
       },
       getContext(_list: List) {
@@ -133,13 +135,7 @@ describe('List', function() {
       ipfs: {
         getFile(cid: string) {
           expect(cid).to.equal('myCID');
-          return `
-      module.exports.name = 'Polymarket';
-
-      module.exports.setup = function setup(context) {
-        context.register({ id: 'polymarket', metadata: {} });
-      }
-    `;
+          return POLYGON_MODULE_CODE;
         },
       },
       getContext(_list: List) {
@@ -156,6 +152,31 @@ describe('List', function() {
     await list.fetchAdapters();
     fetchedOnce = true;
     await list.fetchAdapters();
+
+    expect(list.adapters.length).to.equal(1);
+    expect(list.adapters[0].id).to.equal('polymarket');
+  });
+
+  it('should fetch a single module from IPFS', async function() {
+    const sdk = {
+      ipfs: {
+        getFile(cid: string) {
+          expect(cid).to.equal('myCID');
+          return POLYGON_MODULE_CODE;
+        },
+      },
+      getContext(_list: List) {
+        return {
+          register(registration: any) {
+            _list.addAdapter(registration);
+          }
+        };
+      },
+    } as unknown as BaseCryptoStatsSDK;
+
+    const list = new List('test', sdk);
+
+    await list.fetchAdapterFromIPFS('myCID');
 
     expect(list.adapters.length).to.equal(1);
     expect(list.adapters[0].id).to.equal('polymarket');

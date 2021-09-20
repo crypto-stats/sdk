@@ -124,12 +124,21 @@ export class List {
 
     const response = await this.sdk.http.get(`https://cryptostats.community/api/list/${this.name}`);
 
-    const adapters: string[] = await Promise.all(
-      response.result.map((cid: string) => this.sdk!.ipfs.getFile(cid)));
+    const modules = await Promise.all(
+      response.result.map((cid: string) => this.fetchAdapterFromIPFS(cid))
+    );
 
-    const modules = adapters.map(adapter => this.addAdaptersWithCode(adapter));
     this.adaptersFetched = true;
     return modules;
+  }
+
+  async fetchAdapterFromIPFS(cid: string) {
+    if (!this.sdk) {
+      throw new Error('SDK not set');
+    }
+
+    const code = await this.sdk.ipfs.getFile(cid);
+    return this.addAdaptersWithCode(code);
   }
 
   addAdaptersWithCode(code: string) {

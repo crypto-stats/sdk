@@ -66,7 +66,7 @@ export class Context {
     this.list.addAdapter(registration);
   }
 
-  registerBundle(id: string) {
-    this.list.addBundle(id);
+  registerBundle(id: string, metadata?: any) {
+    this.list.addBundle(id, metadata);
   }
 }

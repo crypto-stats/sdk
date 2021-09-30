@@ -5,6 +5,10 @@ export class Metadata {
     this.metadata = metadata;
   }
 
+  getRawMetadata() {
+    return this.metadata;
+  }
+
   async getMetadata() {
     const metadata = { ...this.metadata };
 

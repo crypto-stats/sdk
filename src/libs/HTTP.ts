@@ -25,7 +25,7 @@ export class HTTP {
     });
 
     if (request.status !== 200) {
-      throw new Error(`Request to ${url} returned an error`);
+      throw new Error(`Request to ${url} returned an error (${request.status})`);
     }
 
     const response = await (options?.plainText ? request.text() : request.json());

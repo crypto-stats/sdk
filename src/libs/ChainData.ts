@@ -29,6 +29,7 @@ export class ChainData {
     this.blockNumLoaders.bsc = this.getBlockSubgraphQuery('generatefinance/bsc-blocks');
     this.blockNumLoaders.polygon = this.getBlockSubgraphQuery('elkfinance/matic-blocks');
     this.blockNumLoaders.avalanche = this.getBlockSubgraphQuery('dasconnor/avalanche-blocks');
+    this.blockNumLoaders['arbitrum-one'] = this.getBlockSubgraphQuery('dodoex/arbitrum-one-blocks');
     this.blockNumLoaders.optimism = async (date: string | Date | number) => {
       const time = this.dateToTime(date);
       const res = await this.graph.query(

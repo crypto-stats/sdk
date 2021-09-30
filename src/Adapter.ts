@@ -1,4 +1,5 @@
 import { ICache } from './types';
+import { Metadata } from './Metadata';
 
 interface AdapterProps {
   metadata: any;
@@ -10,7 +11,7 @@ type QueryFn<Output = any, Input = any> = (...params: Input[]) => Promise<Output
 
 export class Adapter {
   readonly id: string;
-  public metadata: any;
+  private metadata: Metadata;
   readonly bundle: string | null;
 
   public queries: { [name: string]: (...params: any[]) => Promise<number> } = {};
@@ -18,7 +19,7 @@ export class Adapter {
 
   constructor(id: string, { metadata, cache, bundle }: AdapterProps) {
     this.id = id;
-    this.metadata = metadata;
+    this.metadata = new Metadata(metadata);
     this.cache = cache || null;
     this.bundle = bundle || null;
   }
@@ -61,18 +62,6 @@ export class Adapter {
   }
 
   async getMetadata() {
-    const metadata = { ...this.metadata };
-
-    await Promise.all(Object.entries(metadata).map(async ([key, val]: [string, any]) => {
-      if (val?.then) {
-        metadata[key] = await val;
-      } else if (typeof(val) === 'function') {
-        const promiseOrResult = val();
-        this.metadata[key] = promiseOrResult;
-        metadata[key] = await promiseOrResult;
-      }
-    }));
-
-    return metadata;
+    return await this.metadata.getMetadata();
   }
 }

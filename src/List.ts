@@ -2,6 +2,7 @@ import { Adapter } from './Adapter';
 import { BaseCryptoStatsSDK } from './BaseCryptoStatsSDK';
 import { SetupFn } from './types';
 import { Module } from './Module';
+import { Metadata } from './Metadata';
 
 interface AdapterData {
   id: string;
@@ -13,8 +14,9 @@ interface AdapterData {
 export class List {
   readonly name: string;
   readonly adapters: Adapter[] = [];
-  readonly bundles: string[] = [];
+  readonly bundleIds: string[] = [];
   private adaptersById: { [id: string]: Adapter } = {};
+  private bundlesById: { [id: string]: Metadata } = {};
   private sdk?: BaseCryptoStatsSDK;
 
   private adaptersFetched = false;
@@ -35,10 +37,6 @@ export class List {
       bundle,
     });
 
-    if (bundle && this.bundles.indexOf(bundle) === -1) {
-      this.bundles.push(bundle);
-    }
-
     for (let name in queries) {
       adapter.addQuery(name, queries[name]);
     }
@@ -49,12 +47,13 @@ export class List {
     return adapter;
   }
 
-  addBundle(id: string) {
-    if (this.bundles.indexOf(id) !== -1) {
+  addBundle(id: string, metadata: any = {}) {
+    if (this.bundleIds.indexOf(id) !== -1) {
       throw new Error(`Bundle ${id} already exists`);
     }
 
-    this.bundles.push(id);
+    this.bundleIds.push(id);
+    this.bundlesById[id] = new Metadata(metadata);
   }
 
   getAdapters() {
@@ -67,6 +66,18 @@ export class List {
 
   getIDs() {
     return Object.keys(this.adaptersById);
+  }
+
+  async getBundle(id: string) {
+    if (!this.bundlesById[id]) {
+      throw new Error(`No bundle ${id}`);
+    }
+    const metadata = await this.bundlesById[id].getMetadata();
+    return metadata;
+  }
+
+  getBundles() {
+    return Promise.all(this.bundleIds.map((id: string) => this.bundlesById[id].getMetadata()));
   }
 
   async executeQuery(type: string, ...params: any[]) {

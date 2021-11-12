@@ -1,24 +1,28 @@
 import { Graph } from './Graph';
 import { DateLib } from './DateLib';
 import { ICache } from '../types';
+import type { Log, LogInterface } from './Log';
 
 interface ChainDataProps {
   graph: Graph;
   cache: ICache;
   date: DateLib;
+  log: Log;
 }
 
 export class ChainData {
   private graph: Graph;
   private date: DateLib;
   private cache: ICache;
+  private log: LogInterface;
   private blockNumLoaders: { [id: string]: (date: string | Date | number) => Promise<number> } = {};
   private promiseCache: { [id: string]: Promise<number> } = {};
 
-  constructor({ graph, date, cache }: ChainDataProps) {
+  constructor({ graph, date, cache, log }: ChainDataProps) {
     this.graph = graph;
     this.date = date;
     this.cache = cache;
+    this.log = log.getLogInterface();
 
     this.blockNumLoaders.ethereum = this.getBlockSubgraphQuery('blocklytics/ethereum-blocks');
     this.blockNumLoaders.kovan = this.getBlockSubgraphQuery('blocklytics/kovan-blocks');
@@ -79,7 +83,7 @@ export class ChainData {
       return cachedValue;
     }
 
-    console.log(`Cache miss for block number for ${chain} on ${date}`);
+    this.log.debug(`Cache miss for block number for ${chain} on ${date}`);
 
     const block = await loader(date);
 

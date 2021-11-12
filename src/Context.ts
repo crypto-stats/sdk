@@ -5,6 +5,7 @@ import { Ethers } from './libs/Ethers';
 import { IPFS } from './libs/IPFS';
 import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
+import { Log, LogInterface } from './libs/Log';
 import { Plugins } from './libs/Plugins';
 import { List } from './List';
 
@@ -23,6 +24,7 @@ interface ContextProps {
   graph: Graph;
   http: HTTP;
   ipfs: IPFS;
+  log: Log;
   plugins: Plugins;
   list: List;
 }
@@ -35,6 +37,7 @@ export class Context {
   readonly graph: Graph;
   readonly http: HTTP;
   readonly ipfs: IPFS;
+  readonly log: LogInterface;
   readonly plugins: Plugins;
 
   private list: List;
@@ -47,6 +50,7 @@ export class Context {
     http,
     ipfs,
     ethers,
+    log,
     plugins,
     list,
   }: ContextProps) {
@@ -57,6 +61,7 @@ export class Context {
     this.http = http;
     this.ipfs = ipfs;
     this.ethers = ethers;
+    this.log = log.getLogInterface();
     this.plugins = plugins;
 
     this.list = list;

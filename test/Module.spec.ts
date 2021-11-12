@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { Context } from '../src/Context';
 import { List } from '../src/List';
 import { Module } from '../src/Module';
+import { Log } from '../src/libs/Log';
 import { IPFS } from '../src/libs/IPFS';
 
 describe('Module', function() {
@@ -17,6 +18,7 @@ describe('Module', function() {
       graph: {} as any,
       http: {} as any,
       ethers: {} as any,
+      log: new Log(),
       plugins: {} as any,
       ipfs,
       list,
@@ -71,6 +73,7 @@ describe('Module', function() {
       graph: {} as any,
       http: {} as any,
       ethers: {} as any,
+      log: new Log(),
       plugins: {} as any,
       ipfs,
       list,
@@ -110,6 +113,7 @@ describe('Module', function() {
       graph: {} as any,
       http: {} as any,
       ethers: {} as any,
+      log: new Log(),
       plugins: {} as any,
       ipfs,
       list,

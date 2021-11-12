@@ -1,18 +1,22 @@
 import { ICache } from '../types';
 import { HTTP } from './HTTP';
+import type { Log, LogInterface } from './Log';
 
 interface CoinGeckoProps {
   cache: ICache;
   http: HTTP;
+  log: Log;
 }
 
 export class CoinGecko {
   private cache: ICache;
   private http: HTTP;
+  private log: LogInterface;
 
-  constructor({ cache, http }: CoinGeckoProps) {
+  constructor({ cache, http, log }: CoinGeckoProps) {
     this.cache = cache;
     this.http = http;
+    this.log = log.getLogInterface();
   }
 
   async getCurrentPrice(name: string, currency = 'usd') {
@@ -61,8 +65,7 @@ export class CoinGecko {
     price: number,
     marketCap: number
   ) {
-    // eslint-disable-next-line no-console
-    console.log(`Optimisticly caching market data for ${name} on ${date}`);
+    this.log.debug(`Optimisticly caching market data for ${name} on ${date}`);
 
     await Promise.all([
       this.cache.setValue(name, 'price', date, price),
@@ -71,8 +74,7 @@ export class CoinGecko {
   }
 
   async queryCoingecko(name: string, date: string, currency = 'usd') {
-    // eslint-disable-next-line no-console
-    console.log(`Querying CoinGecko for ${name} on ${date}`);
+    this.log.debug(`Querying CoinGecko for ${name} on ${date}`);
 
     const reversedDate = date.split('-').reverse().join('-');
     const response = await this.http.get(

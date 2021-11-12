@@ -6,6 +6,7 @@ import { Ethers } from './libs/Ethers';
 import { IPFS } from './libs/IPFS';
 import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
+import { Log, LOG_LEVEL } from './libs/Log';
 import { Plugins } from './libs/Plugins';
 import { Context } from './Context';
 import { List } from './List';
@@ -19,6 +20,7 @@ export interface CryptoStatsOptions {
   mongoConnectionString?: string;
   redisConnectionString?: string;
   executionTimeout?: number;
+  onLog?: (level: LOG_LEVEL, ...args: any[]) => void;
 }
 
 export abstract class BaseCryptoStatsSDK {
@@ -31,6 +33,7 @@ export abstract class BaseCryptoStatsSDK {
   readonly graph: Graph;
   readonly http: HTTP;
   readonly ipfs: IPFS;
+  readonly log: Log;
   readonly plugins: Plugins;
 
   readonly executionTimeout: number;
@@ -45,6 +48,7 @@ export abstract class BaseCryptoStatsSDK {
     mongoConnectionString,
     redisConnectionString,
     executionTimeout = 30,
+    onLog,
   }: CryptoStatsOptions = {}) {
     this.executionTimeout = executionTimeout;
 
@@ -61,10 +65,16 @@ export abstract class BaseCryptoStatsSDK {
     this.date = new DateLib();
     this.http = new HTTP();
     this.ipfs = new IPFS({ gateway: ipfsGateway });
+    this.log = new Log({ onLog });
     this.graph = new Graph({ http: this.http });
-    this.chainData = new ChainData({ graph: this.graph, cache: this.cache, date: this.date });
+    this.chainData = new ChainData({
+      graph: this.graph,
+      cache: this.cache,
+      date: this.date,
+      log: this.log,
+    });
     this.ethers = new Ethers({ chainData: this.chainData });
-    this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache });
+    this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache, log: this.log });
 
     if (moralisKey) {
       const networks = ['mainnet', 'kovan', 'ropsten', 'goerli', 'rinkeby'];
@@ -102,6 +112,7 @@ export abstract class BaseCryptoStatsSDK {
       http: this.http,
       ipfs: this.ipfs,
       ethers: this.ethers,
+      log: this.log,
       plugins: this.plugins,
       list,
     });

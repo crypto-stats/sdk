@@ -61,6 +61,10 @@ export class Adapter {
     return result;
   }
 
+  getRawMetadata() {
+    return this.metadata.getRawMetadata();
+  }
+
   async getMetadata() {
     return await this.metadata.getMetadata();
   }

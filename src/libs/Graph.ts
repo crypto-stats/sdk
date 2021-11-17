@@ -4,7 +4,7 @@ interface GraphProps {
   http: HTTP;
 }
 
-interface Options {
+interface QueryOptions {
   variables?: any;
   operationName?: string;
   node?: string;
@@ -24,7 +24,7 @@ export class Graph {
       variables,
       operationName,
       node = 'https://api.thegraph.com',
-    }: Options = {}
+    }: QueryOptions = {}
   ): Promise<any> {
     const response = await this.http.post(`${node}/subgraphs/name/${subgraph}`, {
         query,

@@ -1,6 +1,3 @@
-import 'isomorphic-fetch';
-declare const fetch: any;
-
 export enum LOG_LEVEL {
   DEBUG,
   INFO,

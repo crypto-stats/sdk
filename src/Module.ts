@@ -19,8 +19,8 @@ export class Module {
   license: string | null;
   sourceFile: string | null;
 
-  private code: string | null;
-  private setupFn: SetupFn | null = null;
+  public code: string | null;
+  public setupFn: SetupFn | null = null;
   private context: Context;
   private executionTimeout: number;
 

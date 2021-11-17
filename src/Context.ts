@@ -12,7 +12,7 @@ import { List } from './List';
 interface RegistrationData {
   id: string;
   bundle?: string;
-  queries: { [name: string]: (date: string) => Promise<any> };
+  queries: { [name: string]: (...args: any[]) => Promise<any> };
   metadata: any;
 }
 

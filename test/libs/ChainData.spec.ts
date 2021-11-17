@@ -4,12 +4,14 @@ import { ChainData } from '../../src/libs/ChainData';
 import { DateLib } from '../../src/libs/DateLib';
 import { Graph } from '../../src/libs/Graph';
 import { HTTP } from '../../src/libs/HTTP';
+import { Log } from '../../src/libs/Log';
 
 describe('Graph', function() {
   let chainData = new ChainData({
     graph: new Graph({ http: new HTTP() }),
     date: new DateLib(),
     cache: new MemoryCache(),
+    log: new Log(),
   });
 
   beforeEach(() => {
@@ -17,6 +19,7 @@ describe('Graph', function() {
       graph: new Graph({ http: new HTTP() }),
       date: new DateLib(),
       cache: new MemoryCache(),
+      log: new Log(),
     });
   });
 

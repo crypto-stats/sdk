@@ -2,17 +2,20 @@ import { expect } from 'chai';
 import { MemoryCache } from '../../src/caches/MemoryCache';
 import { CoinGecko } from '../../src/libs/CoinGecko';
 import { HTTP } from '../../src/libs/HTTP';
+import { Log } from '../../src/libs/Log';
 
 describe('CoinGecko', function() {
   let coinGecko = new CoinGecko({
     http: new HTTP(),
     cache: new MemoryCache(),
+    log: new Log(),
   });
 
   beforeEach(() => {
     coinGecko = new CoinGecko({
       http: new HTTP(),
       cache: new MemoryCache(),
+      log: new Log(),
     });
   });
 

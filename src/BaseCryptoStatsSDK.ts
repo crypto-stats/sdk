@@ -92,6 +92,8 @@ export abstract class BaseCryptoStatsSDK {
         this.ethers.addProvider(network === 'mainnet' ? 'ethereum' : network, url);
       }
     }
+    this.ethers.addProvider('optimism', 'https://mainnet.optimism.io', { archive: true });
+    this.ethers.addProvider('arbitrum-one', 'https://arb1.arbitrum.io/rpc');
   }
 
   protected abstract setupCache(params: { mongoConnectionString?: string; redisConnectionString?: string }): void;

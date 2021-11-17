@@ -1,3 +1,5 @@
+import { clean } from './utils/clean';
+
 export class Metadata {
   private metadata: { [key: string]: any };
 
@@ -14,11 +16,16 @@ export class Metadata {
 
     await Promise.all(Object.entries(metadata).map(async ([key, val]: [string, any]) => {
       if (val?.then) {
-        metadata[key] = await val;
+        metadata[key] = clean(await val);
       } else if (typeof(val) === 'function') {
         const promiseOrResult = val();
         this.metadata[key] = promiseOrResult;
-        metadata[key] = await promiseOrResult;
+        metadata[key] = clean(await promiseOrResult);
+      } else {
+        // Since adapters generate objects in an isolated context, some serializers such
+        // as Next.js don't recognize these objects as plain objects. The 'clean'
+        // function will recreate fresh objects in the main context.
+        metadata[key] = clean(metadata[key]);
       }
     }));
 

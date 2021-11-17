@@ -1,3 +1,4 @@
+import { clean } from './utils/clean';
 import { ICache } from './types';
 import { Metadata } from './Metadata';
 
@@ -56,7 +57,7 @@ export class Adapter {
       throw new Error(`Adapter ${this.id} does not support ${type} queries`);
     }
 
-    const result = await this.queries[type](...params);
+    const result = clean(await this.queries[type](...params));
 
     return result;
   }

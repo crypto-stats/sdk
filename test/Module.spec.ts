@@ -137,4 +137,70 @@ describe('Module', function() {
     const polymarketModule = new Module({ code, context });
     polymarketModule.evaluate();
   });
+
+  it('should output normal serializable objects', async function () {
+    this.timeout(5000);
+
+    function getObjectClassLabel(value: any): string {
+      return Object.prototype.toString.call(value)
+    }
+
+    function isPlainObject(value: any): boolean {
+      if (getObjectClassLabel(value) !== '[object Object]') {
+        return false
+      }
+
+      const prototype = Object.getPrototypeOf(value)
+      return prototype === null || prototype === Object.prototype
+    }
+
+    const ipfs = new IPFS();
+    const list = new List('fees');
+    const context = new Context({
+      coinGecko: {} as any,
+      chainData: {} as any,
+      date: {} as any,
+      graph: {} as any,
+      http: {} as any,
+      ethers: {} as any,
+      log: new Log(),
+      plugins: {} as any,
+      ipfs,
+      list,
+    });
+
+    const code = `
+      module.exports.name = 'Polymarket';
+      module.exports.version = '1.0.1';
+
+      module.exports.setup = function setup(context) {
+        context.register({
+          id: 'polymarket',
+          queries: {
+            test: async () => ({ value: 1 }),
+          },
+          metadata: {
+            name: 'Polymarket',
+            events: [
+              { date: '2021-01-01' },
+            ],
+          },
+        });
+      }
+    `;
+
+    const polymarketModule = new Module({ code, context });
+    polymarketModule.evaluate();
+
+    polymarketModule.setup();
+
+    const adapters = list.getAdapters();
+    expect(adapters.length).to.equal(1);
+
+    const metadata = await adapters[0].getMetadata();
+    expect(isPlainObject(metadata.events[0])).to.be.true;
+
+    const result = await adapters[0].query('test');
+    expect(isPlainObject(result)).to.be.true;
+  })
 });

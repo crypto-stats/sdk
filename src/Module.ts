@@ -11,6 +11,7 @@ interface ModuleProps {
   version?: string;
   license?: string;
   sourceFile?: string;
+  previousVersion?: string;
   executionTimeout?: number;
 }
 
@@ -21,6 +22,7 @@ export class Module {
   version: string | null;
   license: string | null;
   sourceFile: string | null;
+  previousVersion: string | null;
   signer: string | null = null;
   signature: string | null = null;
 
@@ -29,7 +31,9 @@ export class Module {
   private context: Context;
   private executionTimeout: number;
 
-  constructor({ code, setupFn, context, name, version, license, sourceFile, executionTimeout = 30 }: ModuleProps) {
+  constructor({
+    code, setupFn, context, name, version, license, sourceFile, previousVersion, executionTimeout = 30
+  }: ModuleProps) {
     if (code && setupFn) {
       throw new Error('Can not provide code and setup function');
     }
@@ -42,6 +46,7 @@ export class Module {
     this.version = version || null;
     this.license = license || null;
     this.sourceFile = sourceFile || null;
+    this.previousVersion = previousVersion || null;
     this.context = context;
     this.executionTimeout = executionTimeout;
 
@@ -112,6 +117,7 @@ export class Module {
     this.version = vmModule.exports.version || null;
     this.license = vmModule.exports.license || null;
     this.sourceFile = vmModule.exports.sourceFile || null;
+    this.previousVersion = vmModule.exports.previousVersion || null;
   }
 
   setup() {

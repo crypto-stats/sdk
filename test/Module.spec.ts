@@ -203,4 +203,88 @@ describe('Module', function() {
     const result = await adapters[0].query('test');
     expect(isPlainObject(result)).to.be.true;
   })
+
+  it('should verify signed adapter code', async function () {
+    this.timeout(5000);
+
+    const ipfs = new IPFS();
+    const list = new List('fees');
+    const context = new Context({
+      coinGecko: {} as any,
+      chainData: {} as any,
+      date: {} as any,
+      graph: {} as any,
+      http: {} as any,
+      ethers: {} as any,
+      log: new Log(),
+      plugins: {} as any,
+      ipfs,
+      list,
+    });
+
+    const code = `"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setup = exports.license = exports.version = exports.name = void 0;
+exports.name = 'Sample Signature';
+exports.version = '0.1.2';
+exports.license = 'MIT';
+function setup() { }
+exports.setup = setup;
+
+exports.previousVersion = 'QmeoZNqWDJVPamkzfUU7g7csTKU917yTSwnp9YdoTXewrk';
+
+exports.sourceFile = 'QmakMftxr1j7W2PdiJa1RuhbXTzGL5vKx1TKZRqDQ5bJEp';
+
+exports.signer = '0x3431c5139Bb6F5ba16E4d55EF2420ba8E0E127F6';
+exports.signature = '0x99c84bcca90b7ecc61ed01e7466be8a5a091664e1001b4ded231d276e77fde8174a59a04c1782c49d715ef5fd06de34d4f51cc044c02e5a6595a125a57fe06721c';
+`;
+
+    const signedModule = new Module({ code, context });
+    signedModule.evaluate();
+
+    expect(signedModule.name).to.equal('Sample Signature');
+    expect(signedModule.version).to.equal('0.1.2');
+    expect(signedModule.license).to.equal('MIT');
+    expect(signedModule.sourceFile).to.equal('QmakMftxr1j7W2PdiJa1RuhbXTzGL5vKx1TKZRqDQ5bJEp');
+    expect(signedModule.signer).to.equal('0x3431c5139Bb6F5ba16E4d55EF2420ba8E0E127F6');
+    expect(signedModule.signature).to.equal('0x99c84bcca90b7ecc61ed01e7466be8a5a091664e1001b4ded231d276e77fde8174a59a04c1782c49d715ef5fd06de34d4f51cc044c02e5a6595a125a57fe06721c');
+  });
+
+  it('should reject invalid signature', async function () {
+    this.timeout(5000);
+
+    const ipfs = new IPFS();
+    const list = new List('fees');
+    const context = new Context({
+      coinGecko: {} as any,
+      chainData: {} as any,
+      date: {} as any,
+      graph: {} as any,
+      http: {} as any,
+      ethers: {} as any,
+      log: new Log(),
+      plugins: {} as any,
+      ipfs,
+      list,
+    });
+
+    const code = `"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.setup = exports.license = exports.version = exports.name = void 0;
+exports.name = 'Sample Signature';
+exports.version = '0.1.2';
+exports.license = 'MIT';
+function setup() { }
+exports.setup = setup;
+
+exports.previousVersion = 'QmeoZNqWDJVPamkzfUU7g7csTKU917yTSwnp9YdoTXewrk';
+
+exports.sourceFile = 'QmakMftxr1j7W2PdiJa1RuhbXTzGL5vKx1TKZRqDQ5bJEp';
+
+exports.signer = '0x3431c5139Bb6F5ba16E4d55EF2420ba8E0E127F6';
+exports.signature = '0x000000cca90b7ecc61ed01e7466be8a5a091664e1001b4ded231d276e77fde8174a59a04c1782c49d715ef5fd06de34d4f51cc044c02e5a6595a125a57fe06721c';
+`;
+
+    expect(() => new Module({ code, context })).to.throw('Invalid signature on module');
+  });
 });

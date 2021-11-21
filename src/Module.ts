@@ -1,4 +1,5 @@
-import vm from 'vm'
+import vm from 'vm';
+import { ethers } from 'ethers';
 import { Context } from './Context'
 import { SetupFn } from './types';
 
@@ -13,11 +14,15 @@ interface ModuleProps {
   executionTimeout?: number;
 }
 
+const SIGNATURE_REGEX = /\nexports.signer = ['"](0x[0-9a-fA-F]{40})['"];\nexports.signature = ['"](0x[0-9a-fA-F]{130})['"];\n/
+
 export class Module {
   name: string | null;
   version: string | null;
   license: string | null;
   sourceFile: string | null;
+  signer: string | null = null;
+  signature: string | null = null;
 
   public code: string | null;
   public setupFn: SetupFn | null = null;
@@ -39,6 +44,23 @@ export class Module {
     this.sourceFile = sourceFile || null;
     this.context = context;
     this.executionTimeout = executionTimeout;
+
+    if (code) {
+      const signatureResults = SIGNATURE_REGEX.exec(code);
+      if (signatureResults) {
+        const [signatureMetadata, signer, signature] = signatureResults;
+
+        const signedCode = code.replace(signatureMetadata, '');
+        const verifiedSigner = ethers.utils.verifyMessage(signedCode, signature);
+
+        if (verifiedSigner.toLowerCase() !== signer.toLowerCase()) {
+          throw new Error('Invalid signature on module');
+        }
+
+        this.signer = signer;
+        this.signature = signature;
+      }
+    }
   }
 
   evaluate() {

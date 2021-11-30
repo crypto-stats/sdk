@@ -133,10 +133,20 @@ export class List {
       return;
     }
 
-    const response = await this.sdk.http.get(`https://cryptostats.community/api/list/${this.name}`);
+    const query = `query adapters($list: String!){
+      listAdapters(where: { list: $list }) {
+        adapter {
+          id
+        }
+      }
+    }`;
+
+    const data = await this.sdk.graph.query(this.sdk.adapterListSubgraph, query, {
+      variables: { list: this.name },
+    });
 
     const modules = await Promise.all(
-      response.result.map((cid: string) => this.fetchAdapterFromIPFS(cid))
+      data.listAdapters.map((adapter: any) => this.fetchAdapterFromIPFS(adapter.adapter.id))
     );
 
     this.adaptersFetched = true;

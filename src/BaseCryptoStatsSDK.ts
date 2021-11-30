@@ -20,6 +20,7 @@ export interface CryptoStatsOptions {
   mongoConnectionString?: string;
   redisConnectionString?: string;
   executionTimeout?: number;
+  adapterListSubgraph?: string;
   onLog?: (level: LOG_LEVEL, ...args: any[]) => void;
 }
 
@@ -36,6 +37,7 @@ export abstract class BaseCryptoStatsSDK {
   readonly log: Log;
   readonly plugins: Plugins;
 
+  readonly adapterListSubgraph: string;
   readonly executionTimeout: number;
 
   private lists: { [name: string]: List } = {};
@@ -48,9 +50,11 @@ export abstract class BaseCryptoStatsSDK {
     mongoConnectionString,
     redisConnectionString,
     executionTimeout = 30,
+    adapterListSubgraph = 'dmihal/stateless-list-registry-kovan',
     onLog,
   }: CryptoStatsOptions = {}) {
     this.executionTimeout = executionTimeout;
+    this.adapterListSubgraph = adapterListSubgraph;
 
     // Ensure the cache is set. This should be overwritten, but the compiler likes it :)
     this.cache = new MemoryCache();

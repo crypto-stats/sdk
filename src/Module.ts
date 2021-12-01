@@ -57,7 +57,8 @@ export class Module {
 
         const signedCode = code.replace(signatureMetadata, '');
         const hash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(signedCode));
-        const verifiedSigner = ethers.utils.verifyMessage(hash, signature);
+        const message = `CryptoStats Adapter Hash: ${hash}`;
+        const verifiedSigner = ethers.utils.verifyMessage(message, signature);
 
         if (verifiedSigner.toLowerCase() !== signer.toLowerCase()) {
           throw new Error('Invalid signature on module');

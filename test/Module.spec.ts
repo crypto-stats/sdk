@@ -226,30 +226,30 @@ describe('Module', function() {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setup = exports.license = exports.version = exports.name = void 0;
 exports.name = 'Sample Signature';
-exports.version = '0.1.4';
+exports.version = '0.1.5';
 exports.license = 'MIT';
 // Test
 function setup() { }
 exports.setup = setup;
 
-exports.previousVersion = 'QmWGfv9wgVTEVEhp2D5YaDF6DPz8enNQDXHSwBUPXuPUPf';
+exports.previousVersion = 'QmPgfKUH1VwiwbLgh4S6UMHXiMhCXQ1knrQfcFvBGeh2Px';
 
-exports.sourceFile = 'QmeQjzBURFYUQ6MEKya2jWyxZ4y9QuVjfk6ecNbqCjYuYL';
+exports.sourceFile = 'QmYbNeEaJGpZ97Ty4ZeFuQSLFy6yhL3j7GiE5W87cyKTBS';
 
 exports.signer = '0x3431c5139Bb6F5ba16E4d55EF2420ba8E0E127F6';
-exports.signature = '0x4cb44136a3e64d9eeee638f9467af57b85ef06993dad1b4d86a03849435c68fb78930c4b4985d32217a784ab2aa01c97a16354924b92f653dde92af2e2a6b0031b';
+exports.signature = '0x65ac2f14c5808cc56d8dc4409c0557dbe51fb537f6b890bae1cd9dae0f3f94667a7ecc315d0631f44c0cb9e4b2a74f7b9b2c94415690859afd3cb8d6a9ec1dcb1b';
 `;
 
     const signedModule = new Module({ code, context });
     signedModule.evaluate();
 
     expect(signedModule.name).to.equal('Sample Signature');
-    expect(signedModule.version).to.equal('0.1.4');
+    expect(signedModule.version).to.equal('0.1.5');
     expect(signedModule.license).to.equal('MIT');
-    expect(signedModule.sourceFile).to.equal('QmeQjzBURFYUQ6MEKya2jWyxZ4y9QuVjfk6ecNbqCjYuYL');
-    expect(signedModule.previousVersion).to.equal('QmWGfv9wgVTEVEhp2D5YaDF6DPz8enNQDXHSwBUPXuPUPf');
+    expect(signedModule.sourceFile).to.equal('QmYbNeEaJGpZ97Ty4ZeFuQSLFy6yhL3j7GiE5W87cyKTBS');
+    expect(signedModule.previousVersion).to.equal('QmPgfKUH1VwiwbLgh4S6UMHXiMhCXQ1knrQfcFvBGeh2Px');
     expect(signedModule.signer).to.equal('0x3431c5139Bb6F5ba16E4d55EF2420ba8E0E127F6');
-    expect(signedModule.signature).to.equal('0x4cb44136a3e64d9eeee638f9467af57b85ef06993dad1b4d86a03849435c68fb78930c4b4985d32217a784ab2aa01c97a16354924b92f653dde92af2e2a6b0031b');
+    expect(signedModule.signature).to.equal('0x65ac2f14c5808cc56d8dc4409c0557dbe51fb537f6b890bae1cd9dae0f3f94667a7ecc315d0631f44c0cb9e4b2a74f7b9b2c94415690859afd3cb8d6a9ec1dcb1b');
   });
 
   it('should reject invalid signature', async function () {

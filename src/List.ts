@@ -133,8 +133,8 @@ export class List {
       return;
     }
 
-    const query = `query adapters($list: String!){
-      listAdapters(where: { list: $list }) {
+    const query = `query adapters($collection: String!){
+      collectionAdapters(where: { collection: $collection }) {
         adapter {
           id
         }
@@ -142,11 +142,11 @@ export class List {
     }`;
 
     const data = await this.sdk.graph.query(this.sdk.adapterListSubgraph, query, {
-      variables: { list: this.name },
+      variables: { collection: this.name },
     });
 
     const modules = await Promise.all(
-      data.listAdapters.map((adapter: any) => this.fetchAdapterFromIPFS(adapter.adapter.id))
+      data.collectionAdapters.map((adapter: any) => this.fetchAdapterFromIPFS(adapter.adapter.id))
     );
 
     this.adaptersFetched = true;

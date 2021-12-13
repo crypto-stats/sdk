@@ -92,10 +92,25 @@ describe('List', function() {
 
   it('should fetch modules', async function() {
     const sdk = {
-      http: {
-        async get(url: string) {
-          expect(url).to.equal('https://cryptostats.community/api/list/test');
-          return { success: true, result: ['myCID'] };
+      adapterListSubgraph: 'test/subgraph',
+      graph: {
+        async query(subgraph: string) {
+          expect(subgraph).to.equal('test/subgraph');
+          return {
+            collectionAdapters: [
+              {
+                adapter: {
+                  id: 'myCID'
+                },
+              },
+              {
+                adapter: {
+                  id: 'cidWithCode',
+                  code: 'module.exports.setup = (ctx) => ctx.register({ id: "test2" })',
+                },
+              },
+            ],
+          };
         }
       },
       ipfs: {
@@ -117,9 +132,10 @@ describe('List', function() {
 
     await list.fetchAdapters();
 
-    expect(list.adapters.length).to.equal(1);
-    expect(list.adapters[0].id).to.equal('polymarket');
-    expect(list.adapters[0].bundle).to.equal('my-bundle');
+    expect(list.adapters.length).to.equal(2);
+    expect(list.adapters[0].id).to.equal('test2'); // This one ends up first due to the async IPFS query?
+    expect(list.adapters[1].id).to.equal('polymarket');
+    expect(list.adapters[1].bundle).to.equal('my-bundle');
   });
 
   it('should store bundles', async function() {
@@ -135,13 +151,22 @@ describe('List', function() {
   it('should skip fetching a second time', async function() {
     let fetchedOnce = false;
     const sdk = {
-      http: {
-        async get(url: string) {
+      adapterListSubgraph: 'test/subgraph',
+      graph: {
+        async query(subgraph: string) {
           if (fetchedOnce) {
             throw new Error("Shouldn't fetch a second time");
           }
-          expect(url).to.equal('https://cryptostats.community/api/list/test');
-          return { success: true, result: ['myCID'] };
+          expect(subgraph).to.equal('test/subgraph');
+          return {
+            collectionAdapters: [
+              {
+                adapter: {
+                  id: 'myCID'
+                },
+              },
+            ],
+          };
         }
       },
       ipfs: {

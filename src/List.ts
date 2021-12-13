@@ -124,19 +124,20 @@ export class List {
     }))
   }
 
-  async fetchAdapters() {
+  async fetchAdapters(): Promise<Module[]> {
     if (!this.sdk) {
       throw new Error('SDK not set');
     }
     if (this.adaptersFetched) {
       console.warn(`Adapters for ${this.name} already fetched, skipping`);
-      return;
+      return [];
     }
 
     const query = `query adapters($collection: String!){
       collectionAdapters(where: { collection: $collection }) {
         adapter {
           id
+          code
         }
       }
     }`;
@@ -145,15 +146,18 @@ export class List {
       variables: { collection: this.name },
     });
 
-    const modules = await Promise.all(
-      data.collectionAdapters.map((adapter: any) => this.fetchAdapterFromIPFS(adapter.adapter.id))
+    const modules: Module[] = await Promise.all(
+      data.collectionAdapters.map((collectionAdapter: any) => collectionAdapter.adapter.code
+        ? this.addAdaptersWithCode(collectionAdapter.adapter.code)
+        : this.fetchAdapterFromIPFS(collectionAdapter.adapter.id)
+      )
     );
 
     this.adaptersFetched = true;
     return modules;
   }
 
-  async fetchAdapterFromIPFS(cid: string) {
+  async fetchAdapterFromIPFS(cid: string): Promise<Module> {
     if (!this.sdk) {
       throw new Error('SDK not set');
     }
@@ -162,7 +166,7 @@ export class List {
     return this.addAdaptersWithCode(code);
   }
 
-  addAdaptersWithCode(code: string) {
+  addAdaptersWithCode(code: string): Module {
     if (!this.sdk) {
       throw new Error('SDK not set');
     }

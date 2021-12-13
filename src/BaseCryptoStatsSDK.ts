@@ -50,7 +50,7 @@ export abstract class BaseCryptoStatsSDK {
     mongoConnectionString,
     redisConnectionString,
     executionTimeout = 30,
-    adapterListSubgraph = 'dmihal/stateless-list-registry-kovan',
+    adapterListSubgraph = 'dmihal/cryptostats-adapter-registry-test',
     onLog,
   }: CryptoStatsOptions = {}) {
     this.executionTimeout = executionTimeout;

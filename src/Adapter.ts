@@ -57,9 +57,13 @@ export class Adapter {
       throw new Error(`Adapter ${this.id} does not support ${type} queries`);
     }
 
-    const result = clean(await this.queries[type](...params));
+    try {
+      const result = clean(await this.queries[type](...params));
 
-    return result;
+      return result;
+    } catch (e: any) {
+      throw new Error(`Error executing ${type} on ${this.id}: ${e.message}`);
+    }
   }
 
   getRawMetadata() {

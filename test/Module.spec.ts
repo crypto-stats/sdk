@@ -29,6 +29,8 @@ describe('Module', function() {
       module.exports.version = '1.0.1';
       module.exports.license = 'MIT';
       module.exports.sourceFile = 'Qma...';
+      module.exports.description = 'Test adapter';
+      module.exports.changeLog = 'Change';
 
       module.exports.setup = function setup(context) {
         context.register({
@@ -48,6 +50,8 @@ describe('Module', function() {
     expect(polymarketModule.version).to.equal('1.0.1');
     expect(polymarketModule.license).to.equal('MIT');
     expect(polymarketModule.sourceFile).to.equal('Qma...');
+    expect(polymarketModule.description).to.equal('Test adapter');
+    expect(polymarketModule.changeLog).to.equal('Change');
 
     polymarketModule.setup();
 

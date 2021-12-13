@@ -10,6 +10,8 @@ interface ModuleProps {
   name?: string;
   version?: string;
   license?: string;
+  description?: string;
+  changeLog?: string;
   sourceFile?: string;
   previousVersion?: string;
   executionTimeout?: number;
@@ -21,6 +23,8 @@ export class Module {
   name: string | null;
   version: string | null;
   license: string | null;
+  description: string | null;
+  changeLog: string | null;
   sourceFile: string | null;
   previousVersion: string | null;
   signer: string | null = null;
@@ -32,7 +36,7 @@ export class Module {
   private executionTimeout: number;
 
   constructor({
-    code, setupFn, context, name, version, license, sourceFile, previousVersion, executionTimeout = 30
+    code, setupFn, context, name, version, license, description, changeLog, sourceFile, previousVersion, executionTimeout = 30
   }: ModuleProps) {
     if (code && setupFn) {
       throw new Error('Can not provide code and setup function');
@@ -45,6 +49,8 @@ export class Module {
     this.name = name || null;
     this.version = version || null;
     this.license = license || null;
+    this.description = description || null;
+    this.changeLog = changeLog || null;
     this.sourceFile = sourceFile || null;
     this.previousVersion = previousVersion || null;
     this.context = context;
@@ -118,6 +124,8 @@ export class Module {
     this.name = vmModule.exports.name || null;
     this.version = vmModule.exports.version || null;
     this.license = vmModule.exports.license || null;
+    this.description = vmModule.exports.description || null;
+    this.changeLog = vmModule.exports.changeLog || null;
     this.sourceFile = vmModule.exports.sourceFile || null;
     this.previousVersion = vmModule.exports.previousVersion || null;
   }

@@ -29,19 +29,19 @@ describe('Graph', function() {
   });
 
   it('should query a different graph node', async () => {
-    const query = `{
-      ethburned(id:"1", block: { number: 13054993 }) {
-        burned
+    const query = `query overview {
+      pancakeFactory(id: "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73", block: { number: 13000000 }) {
+        totalTransactions
       }
     }`;
 
-    const result = await graph.query('dmihal/eth-burned', query, {
-      node: 'http://subgraph.ethburned.com',
+    const result = await graph.query('pancakeswap/exchange-v2', query, {
+      node: 'https://bsc.streamingfast.io',
     });
 
     expect(result).to.deep.equal({
-      ethburned: {
-        burned: '63688.35641002801501576',
+      pancakeFactory: {
+        totalTransactions: '397019344',
       },
     });
   });

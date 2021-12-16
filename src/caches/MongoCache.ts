@@ -22,11 +22,11 @@ export class MongoCache {
     this.client.connect();
   }
 
-  async getValue(name: string, type: string, date: string) {
+  async getValue(name: string, type: string, key: string) {
     const query = await this.client
       .db(this.dbName)
       .collection(this.collectionName)
-      .findOne({ name, type, date });
+      .findOne({ name, type, key });
 
 
     if (query && !isNaN(query.value)) {
@@ -36,10 +36,10 @@ export class MongoCache {
     return null;
   }
 
-  async setValue(name: string, type: string, date: string, value: string | number) {
+  async setValue(name: string, type: string, key: string, value: string | number) {
     await this.client
       .db(this.dbName)
       .collection(this.collectionName)
-      .insertOne({ name, type, date, value });
+      .insertOne({ name, type, key, value });
   }
 }

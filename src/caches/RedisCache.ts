@@ -18,8 +18,8 @@ export class RedisCache {
     this.set = promisify(this.client.set).bind(this.client);
   }
 
-  async getValue(name: string, type: string, date: string) {
-    const value = await this.get(this.serialize(name, type, date));
+  async getValue(name: string, type: string, key: string) {
+    const value = await this.get(this.serialize(name, type, key));
     
     if (value && value !== 'NaN') {
       return parseFloat(value);
@@ -27,11 +27,11 @@ export class RedisCache {
     return null;
   }
 
-  setValue(name: string, type: string, date: string, value: string | number) {
-    return this.set(this.serialize(name, type, date), value);
+  setValue(name: string, type: string, key: string, value: string | number) {
+    return this.set(this.serialize(name, type, key), value);
   }
 
-  serialize(name: string, type: string, date: string) {
-    return `${name}-${type}-${date}`;
+  serialize(name: string, type: string, key: string) {
+    return `${name}-${type}-${key}`;
   }
 }

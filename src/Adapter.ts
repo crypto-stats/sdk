@@ -8,7 +8,9 @@ interface AdapterProps {
   bundle?: string | null;
 }
 
-type QueryFn<Output = any, Input = any> = (...params: Input[]) => Promise<Output>
+export type QueryFn<Output = any, Input extends unknown[] = any[]> = (...params: Input) => Promise<Output>
+
+export type CacheKeyResolver<Params extends unknown[] = any[]> = (id: string, query: string, ...params: Params) => string | null | undefined;
 
 export class Adapter {
   readonly id: string;
@@ -17,6 +19,8 @@ export class Adapter {
 
   public queries: { [name: string]: (...params: any[]) => Promise<number> } = {};
   private cache: ICache | null;
+
+  private cacheKeyResolver: CacheKeyResolver | null = null;
 
   constructor(id: string, { metadata, cache, bundle }: AdapterProps) {
     this.id = id;
@@ -41,13 +45,18 @@ export class Adapter {
       return null;
     }
 
-    const inputSerialized = _input.join('-');
-    const cachedValue = await this.cache?.getValue(this.id, type, inputSerialized);
+    const cacheKey = this.cacheKeyResolver ? this.cacheKeyResolver(this.id, type, input) : null;
+    const cachedValue = cacheKey && await this.cache?.getValue(this.id, type, cacheKey);
+
     if (cachedValue) {
       return cachedValue;
     } else {
       const result = await this.executeQuery(type, ..._input);
-      await this.cache?.setValue(this.id, type, inputSerialized, result);
+
+      if (cacheKey) {
+        await this.cache?.setValue(this.id, type, cacheKey, result);
+      }
+
       return result;
     }
   }
@@ -72,5 +81,9 @@ export class Adapter {
 
   async getMetadata() {
     return await this.metadata.getMetadata();
+  }
+
+  setCacheKeyResolver(newResolver: CacheKeyResolver) {
+    this.cacheKeyResolver = newResolver;
   }
 }

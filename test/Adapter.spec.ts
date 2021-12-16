@@ -24,19 +24,24 @@ describe('Adapter', function() {
     });
   });
 
-  it('should save query data to the cache', async function() {
+  it('should save query data to the cache if a cache key is available', async function() {
     const cache = new MemoryCache();
     const adapter = new Adapter('polymarket', {
       metadata: {},
       cache: cache,
     });
-    adapter.addQuery('fee', async () => 50);
+    adapter.addQuery('fee', async (_date: string) => 50);
+    adapter.addQuery('tvl', async (_date: string) => 20);
+
+    adapter.setCacheKeyResolver((_id: string, query: string, params: string[]) => query === 'fee' ? params[0] : null);
 
     const testDate = '2021-01-01';
 
     expect(await adapter.query('fee', testDate)).to.equal(50);
+    expect(await adapter.query('tvl', testDate)).to.equal(20);
 
     expect(await cache.getValue('polymarket', 'fee', testDate)).to.equal(50);
+    expect(await cache.getValue('polymarket', 'tvl', testDate)).to.be.null;
   });
 
   it('should read query data from the cache', async function() {
@@ -44,16 +49,21 @@ describe('Adapter', function() {
     
     const cache = new MemoryCache();
     cache.setValue('polymarket', 'fee', testDate, 100);
+    cache.setValue('polymarket', 'tvl', testDate, 25);
 
     const adapter = new Adapter('polymarket', {
       metadata: {},
       cache: cache,
     });
 
+    adapter.setCacheKeyResolver((_id: string, query: string, params: string[]) => query === 'fee' ? params[0] : null);
+
     // The adapter should NOT return 50, since it reads the cache
     adapter.addQuery('fee', async () => 50);
+    adapter.addQuery('tvl', async () => 50);
 
     expect(await adapter.query('fee', testDate)).to.equal(100);
+    expect(await adapter.query('tvl', testDate)).to.equal(50);
   });
 
   it('should execute adapters with arbitrary numbers of parameters', async function() {

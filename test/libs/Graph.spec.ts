@@ -17,8 +17,7 @@ describe('Graph', function() {
     }`;
 
     const result = await graph.query('dmihal/polygon-fees', query, {
-      variables: { block: 500 },
-      operationName: 'invariant',
+      block: 500,
     });
 
     expect(result).to.deep.equal({
@@ -35,7 +34,9 @@ describe('Graph', function() {
       }
     }`;
 
-    const result = await graph.query('pancakeswap/exchange-v2', query, {
+    const result = await graph.query({
+      subgraph: 'pancakeswap/exchange-v2',
+      query,
       node: 'https://bsc.streamingfast.io',
     });
 

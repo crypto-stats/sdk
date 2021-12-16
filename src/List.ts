@@ -11,6 +11,22 @@ interface AdapterData {
   bundle?: string | null;
 }
 
+export interface ResultWithMetadata {
+  id: string;
+  bundle: string | null;
+  result?: any;
+  error?: any;
+  metadata: { [key: string]: any };
+}
+
+export interface ResultsWithMetadata {
+  id: string;
+  bundle: string | null;
+  results: { [query: string]: any };
+  errors: { [query: string]: any };
+  metadata: { [key: string]: any };
+}
+
 export class List {
   readonly name: string;
   readonly adapters: Adapter[] = [];
@@ -90,36 +106,51 @@ export class List {
     })));
   }
 
-  async executeQueryWithMetadata(type: string, ...params: any[]) {
+  async executeQueryWithMetadata(type: string, ...params: any[]): Promise<ResultWithMetadata[]> {
     return Promise.all(this.adapters.map(async (adapter: Adapter) => {
       const [result, metadata] = await Promise.all([
-        adapter.query(type, ...params),
+        adapter.query(type, ...params)
+          .catch(error => ({ error })),
         adapter.getMetadata(),
       ]);
-      return {
+      const response = {
         id: adapter.id,
         bundle: adapter.bundle,
         result,
         metadata,
       };
+
+      return result.error
+        ? { ...response, error: result.error.message || result.error }
+        : { ...response, result };
     }))
   }
 
-  async executeQueriesWithMetadata(types: string[], ...params: any[]) {
+  async executeQueriesWithMetadata(types: string[], ...params: any[]): Promise<ResultsWithMetadata[]> {
     return Promise.all(this.adapters.map(async (adapter: Adapter) => {
       const [metadata, ...resultsList] = await Promise.all([
         adapter.getMetadata(),
-        ...types.map(type => adapter.query(type, ...params)),
+        ...types.map(type => adapter.query(type, ...params)
+          .catch((error: any) => ({ error }))
+        ),
       ]);
 
       const results: { [type: string]: any } = {};
+      const errors: { [type: string]: any } = {};
+      
       types.forEach((type: string, index: number) => {
-        results[type] = resultsList[index];
+        const result = resultsList[index]
+        if (result.error) {
+          errors[type] = result.error.message || result.error;
+        } else {
+          results[type] = result;
+        }
       });
 
       return {
         id: adapter.id,
         results,
+        errors,
         metadata,
         bundle: adapter.bundle,
       };

@@ -38,13 +38,25 @@ describe('List', function() {
       metadata: {},
     });
 
+    list.addAdapter({
+      id: 'arbitrum',
+      queries: {
+        fee: async () => {
+          throw new Error('Data not found');
+        },
+      },
+      metadata: {},
+    });
+
     const result = await list.executeQueryWithMetadata('fee', 10);
 
-    expect(result.length).to.equal(2);
+    expect(result.length).to.equal(3);
     expect(result[0].id).to.equal('polymarket');
     expect(result[0].result).to.equal(10);
     expect(result[1].id).to.equal('ethereum');
     expect(result[1].result).to.equal(20);
+    expect(result[2].id).to.equal('arbitrum');
+    expect(result[2].error).to.equal('Error executing fee on arbitrum: Data not found');
   });
 
   it('should execute query & load metadata', async function () {
@@ -81,14 +93,29 @@ describe('List', function() {
       },
     });
 
+    list.addAdapter({
+      id: 'ethereum',
+      queries: {
+        fee: async (num: number) => num,
+        tvl: async () => {
+          throw new Error('Data not found');
+        },
+      },
+      metadata: {
+        icon: async () => 'img',
+      },
+    });
+
     const result = await list.executeQueriesWithMetadata(['fee', 'tvl'], 10);
 
-    expect(result.length).to.equal(1);
+    expect(result.length).to.equal(2);
     expect(result[0].results.fee).to.equal(10);
     expect(result[0].results.tvl).to.equal(100);
     expect(result[0].metadata).to.deep.equal({
       icon: 'img',
     });
+    expect(result[1].results.fee).to.equal(10);
+    expect(result[1].errors.tvl).to.equal('Error executing tvl on ethereum: Data not found');
   });
 
   it('should fetch modules', async function() {

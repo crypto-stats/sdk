@@ -33,7 +33,7 @@ export class Graph {
     });
 
     if (response.errors) {
-      throw new Error(response.errors[0].message);
+      throw new Error(`Error querying ${subgraph}: ${response.errors[0].message}`);
     }
 
     return response.data;

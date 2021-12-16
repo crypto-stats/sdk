@@ -35,6 +35,7 @@ class Provider extends ethers.providers.JsonRpcProvider {
 const ERC20_ABI = [
   'function name() external view returns (string)',
   'function symbol() external view returns (string)',
+  'function decimals() external view returns (uint8)',
   'function totalSupply() external view returns (uint256)',
   'function balanceOf(address account) external view returns (uint256)',
   'function transfer(address recipient, uint256 amount) external returns (bool)',

@@ -2,15 +2,16 @@ import { clean } from './utils/clean';
 import { ICache } from './types';
 import { Metadata } from './Metadata';
 
+export type QueryFn<Output = any, Input extends unknown[] = any[]> = (...params: Input) => Promise<Output>
+
+export type CacheKeyResolver<Params extends unknown[] = any[]> = (id: string, query: string, ...params: Params) => string | null | undefined;
+
 interface AdapterProps {
   metadata: any;
   cache?: ICache | null;
   bundle?: string | null;
+  cacheKeyResolver?: CacheKeyResolver | null;
 }
-
-export type QueryFn<Output = any, Input extends unknown[] = any[]> = (...params: Input) => Promise<Output>
-
-export type CacheKeyResolver<Params extends unknown[] = any[]> = (id: string, query: string, ...params: Params) => string | null | undefined;
 
 export class Adapter {
   readonly id: string;
@@ -20,13 +21,14 @@ export class Adapter {
   public queries: { [name: string]: (...params: any[]) => Promise<number> } = {};
   private cache: ICache | null;
 
-  private cacheKeyResolver: CacheKeyResolver | null = null;
+  private cacheKeyResolver: CacheKeyResolver | null;
 
-  constructor(id: string, { metadata, cache, bundle }: AdapterProps) {
+  constructor(id: string, { metadata, cache, bundle, cacheKeyResolver }: AdapterProps) {
     this.id = id;
     this.metadata = new Metadata(metadata);
     this.cache = cache || null;
     this.bundle = bundle || null;
+    this.cacheKeyResolver = cacheKeyResolver || null;
   }
 
   addQuery(type: string, query: QueryFn) {

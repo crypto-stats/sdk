@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { BaseCryptoStatsSDK } from '../src/BaseCryptoStatsSDK';
+import { MemoryCache } from '../src/caches/MemoryCache';
 import { List } from '../src/List';
 
 const POLYGON_MODULE_CODE = `
@@ -230,4 +231,24 @@ describe('List', function() {
       { id: 'test2', result: null, bundle: null },
     ]);
   });
+
+  it('should set a cache key resolver', async () => {
+    const cache = new MemoryCache();
+    const list = new List('test', { cache } as any);
+
+    cache.setValue('test1', 'test', 'a', 50);
+    cache.setValue('test2', 'test', 'a', 50);
+
+    const adapter1 = list.addAdapter({ id: 'test1', queries: { test: () => 1 }, metadata: {} });
+
+    expect(await adapter1.query('test', 'a')).to.equal(1);
+
+    list.setCacheKeyResolver((_id: string, _query: string, params: string[]) => params[0]);
+
+    expect(await adapter1.query('test', 'a')).to.equal(50);
+
+    const adapter2 = list.addAdapter({ id: 'test2', queries: { test: () => 1 }, metadata: {} });
+
+    expect(await adapter2.query('test', 'a')).to.equal(50);
+  })
 });

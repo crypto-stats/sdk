@@ -1,4 +1,4 @@
-import { Adapter } from './Adapter';
+import { Adapter, CacheKeyResolver } from './Adapter';
 import { BaseCryptoStatsSDK } from './BaseCryptoStatsSDK';
 import { SetupFn } from './types';
 import { Module } from './Module';
@@ -20,6 +20,7 @@ export class List {
   private sdk?: BaseCryptoStatsSDK;
 
   private adaptersFetched = false;
+  private cacheKeyResolver: CacheKeyResolver | null = null;
 
   constructor(name: string, sdk?: BaseCryptoStatsSDK) {
     this.name = name;
@@ -35,6 +36,7 @@ export class List {
       metadata,
       cache: this.sdk?.cache,
       bundle,
+      cacheKeyResolver: this.cacheKeyResolver,
     });
 
     for (let name in queries) {
@@ -185,5 +187,12 @@ export class List {
     const newModule = new Module({ setupFn, context, executionTimeout: this.sdk.executionTimeout });
     newModule.setup();
     return newModule;
+  }
+
+  setCacheKeyResolver(resolver: CacheKeyResolver) {
+    this.cacheKeyResolver = resolver;
+    for (const adapter of this.adapters) {
+      adapter.setCacheKeyResolver(resolver);
+    }
   }
 }

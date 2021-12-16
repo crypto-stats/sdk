@@ -60,8 +60,8 @@ describe('Graph', function() {
   });
 
   it('should query the Optimism block number', async () => {
-    const result = await chainData.getBlockNumber('2021-07-10', 'optimism');
+    const result = await chainData.getBlockNumber('2021-12-10', 'optimism');
 
-    expect(result).to.equal(29027);
+    expect(result).to.equal(985165);
   });
 });

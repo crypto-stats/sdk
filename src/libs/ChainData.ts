@@ -34,28 +34,7 @@ export class ChainData {
     this.blockNumLoaders.polygon = this.getBlockSubgraphQuery('elkfinance/matic-blocks');
     this.blockNumLoaders.avalanche = this.getBlockSubgraphQuery('dasconnor/avalanche-blocks');
     this.blockNumLoaders['arbitrum-one'] = this.getBlockSubgraphQuery('dodoex/arbitrum-one-blocks');
-    this.blockNumLoaders.optimism = async (date: string | Date | number) => {
-      const time = this.dateToTime(date);
-      const res = await this.graph.query(
-        'dmihal/optimism-fees',
-        `query blocks($timestamp: String!) {
-          block: dateToBlock(id: $timestamp) {
-            blockNum
-          }
-        }`,
-        {
-          variables: {
-            timestamp: time.toString(),
-          },
-        }
-      );
-
-      if (!res.block) {
-        throw new Error(`Could not find Optimism block on ${date}`);
-      }
-
-      return parseInt(res.block.blockNum);
-    };
+    this.blockNumLoaders.optimism = this.getBlockSubgraphQuery('dmihal/optimism-blocks');
   }
 
   getBlockNumber(date: string | number | Date, chain: string = 'ethereum') {

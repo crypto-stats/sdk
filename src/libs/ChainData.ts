@@ -29,7 +29,7 @@ export class ChainData {
     this.blockNumLoaders.goerli = this.getBlockSubgraphQuery('blocklytics/goerli-blocks');
     this.blockNumLoaders.rinkeby = this.getBlockSubgraphQuery('blocklytics/rinkeby-blocks');
     this.blockNumLoaders.xdai = this.getBlockSubgraphQuery('1hive/xdai-blocks');
-    this.blockNumLoaders.fantom = this.getBlockSubgraphQuery('0xfin/fantomblocks');
+    this.blockNumLoaders.fantom = this.getBlockSubgraphQuery('matthewlilley/fantom-blocks');
     this.blockNumLoaders.bsc = this.getBlockSubgraphQuery('generatefinance/bsc-blocks');
     this.blockNumLoaders.polygon = this.getBlockSubgraphQuery('elkfinance/matic-blocks');
     this.blockNumLoaders.avalanche = this.getBlockSubgraphQuery('dasconnor/avalanche-blocks');

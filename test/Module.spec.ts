@@ -2,27 +2,14 @@ import { expect } from 'chai';
 import { Context } from '../src/Context';
 import { List } from '../src/List';
 import { Module } from '../src/Module';
-import { Log } from '../src/libs/Log';
-import { IPFS } from '../src/libs/IPFS';
+import { createContext } from './helper';
 
 describe('Module', function() {
   it('should add adapters to a list using code', async function () {
     this.timeout(5000);
 
-    const ipfs = new IPFS();
     const list = new List('fees');
-    const context = new Context({
-      coinGecko: {} as any,
-      chainData: {} as any,
-      date: {} as any,
-      graph: {} as any,
-      http: {} as any,
-      ethers: {} as any,
-      log: new Log(),
-      plugins: {} as any,
-      ipfs,
-      list,
-    });
+    const context = createContext({ list });
 
     const code = `
       module.exports.name = 'Polymarket';
@@ -68,20 +55,8 @@ describe('Module', function() {
   it('should add adapters to a list using a function', async function () {
     this.timeout(5000);
 
-    const ipfs = new IPFS();
     const list = new List('fees');
-    const context = new Context({
-      coinGecko: {} as any,
-      chainData: {} as any,
-      date: {} as any,
-      graph: {} as any,
-      http: {} as any,
-      ethers: {} as any,
-      log: new Log(),
-      plugins: {} as any,
-      ipfs,
-      list,
-    });
+    const context = createContext({ list });
 
     const setupFn = function setup(context: Context) {
       context.register({
@@ -108,20 +83,8 @@ describe('Module', function() {
   });
 
   it('should not allow escaping the sandbox using constructors', () => {
-    const ipfs = new IPFS();
     const list = new List('fees');
-    const context = new Context({
-      coinGecko: {} as any,
-      chainData: {} as any,
-      date: {} as any,
-      graph: {} as any,
-      http: {} as any,
-      ethers: {} as any,
-      log: new Log(),
-      plugins: {} as any,
-      ipfs,
-      list,
-    });
+    const context = createContext({ list });
 
     const fail: any = () => {
       throw new Error('Escaped sandbox');
@@ -158,20 +121,8 @@ describe('Module', function() {
       return prototype === null || prototype === Object.prototype
     }
 
-    const ipfs = new IPFS();
     const list = new List('fees');
-    const context = new Context({
-      coinGecko: {} as any,
-      chainData: {} as any,
-      date: {} as any,
-      graph: {} as any,
-      http: {} as any,
-      ethers: {} as any,
-      log: new Log(),
-      plugins: {} as any,
-      ipfs,
-      list,
-    });
+    const context = createContext({ list });
 
     const code = `
       module.exports.name = 'Polymarket';
@@ -211,20 +162,8 @@ describe('Module', function() {
   it('should verify signed adapter code', async function () {
     this.timeout(5000);
 
-    const ipfs = new IPFS();
     const list = new List('fees');
-    const context = new Context({
-      coinGecko: {} as any,
-      chainData: {} as any,
-      date: {} as any,
-      graph: {} as any,
-      http: {} as any,
-      ethers: {} as any,
-      log: new Log(),
-      plugins: {} as any,
-      ipfs,
-      list,
-    });
+    const context = createContext({ list });
 
     const code = `"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -259,20 +198,8 @@ exports.signature = '0x65ac2f14c5808cc56d8dc4409c0557dbe51fb537f6b890bae1cd9dae0
   it('should reject invalid signature', async function () {
     this.timeout(5000);
 
-    const ipfs = new IPFS();
     const list = new List('fees');
-    const context = new Context({
-      coinGecko: {} as any,
-      chainData: {} as any,
-      date: {} as any,
-      graph: {} as any,
-      http: {} as any,
-      ethers: {} as any,
-      log: new Log(),
-      plugins: {} as any,
-      ipfs,
-      list,
-    });
+    const context = createContext({ list });
 
     const code = `"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });

@@ -11,12 +11,14 @@ import { Plugins } from './libs/Plugins';
 import { Context } from './Context';
 import { List } from './List';
 import { ICache } from './types';
+import { Etherscan } from './libs/Etherscan';
 
 export interface CryptoStatsOptions {
   ipfsGateway?: string;
   cache?: ICache;
   infuraKey?: string;
   moralisKey?: string;
+  etherscanKey?: string;
   mongoConnectionString?: string;
   redisConnectionString?: string;
   executionTimeout?: number;
@@ -34,6 +36,7 @@ export abstract class BaseCryptoStatsSDK {
   readonly graph: Graph;
   readonly http: HTTP;
   readonly ipfs: IPFS;
+  readonly etherscan: Etherscan;
   readonly log: Log;
   readonly plugins: Plugins;
 
@@ -47,6 +50,7 @@ export abstract class BaseCryptoStatsSDK {
     cache,
     infuraKey,
     moralisKey,
+    etherscanKey,
     mongoConnectionString,
     redisConnectionString,
     executionTimeout = 30,
@@ -79,6 +83,7 @@ export abstract class BaseCryptoStatsSDK {
     });
     this.ethers = new Ethers({ chainData: this.chainData });
     this.coinGecko = new CoinGecko({ http: this.http, cache: this.cache, log: this.log });
+    this.etherscan = new Etherscan(etherscanKey ? { ethereum: etherscanKey } : {}, this.http);
 
     if (moralisKey) {
       const networks = ['mainnet', 'kovan', 'ropsten', 'goerli', 'rinkeby'];
@@ -118,6 +123,7 @@ export abstract class BaseCryptoStatsSDK {
       http: this.http,
       ipfs: this.ipfs,
       ethers: this.ethers,
+      etherscan: this.etherscan,
       log: this.log,
       plugins: this.plugins,
       list,

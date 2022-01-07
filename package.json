@@ -1,6 +1,6 @@
 {
   "name": "@cryptostats/sdk",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Download and execute CryptoStats adapters",
   "main": "dist/node.js",
   "browser": "dist/browser.js",

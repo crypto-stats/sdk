@@ -99,11 +99,23 @@ export class List {
   }
 
   async executeQuery(type: string, ...params: any[]) {
-    return Promise.all(this.adapters.map(async (adapter: Adapter) => ({
-      id: adapter.id,
-      bundle: adapter.bundle,
-      result: await adapter.query(type, ...params),
-    })));
+    return Promise.all(this.adapters.map(async (adapter: Adapter) => {
+      const result = await adapter.query(type, ...params);
+
+      const response: any = {
+        id: adapter.id,
+        bundle: adapter.bundle,
+      };
+
+      if (result?.error) {
+        response.error = result.error;
+        response.result = null;
+      } else {
+        response.result = result;
+      }
+
+      return response;
+    }));
   }
 
   async executeQueryWithMetadata(type: string, ...params: any[]): Promise<ResultWithMetadata[]> {

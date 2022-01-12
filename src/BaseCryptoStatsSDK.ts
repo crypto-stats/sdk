@@ -22,6 +22,7 @@ export interface CryptoStatsOptions {
   mongoConnectionString?: string;
   redisConnectionString?: string;
   executionTimeout?: number;
+  vm?: any;
   adapterListSubgraph?: string;
   onLog?: (level: LOG_LEVEL, ...args: any[]) => void;
 }
@@ -39,6 +40,7 @@ export abstract class BaseCryptoStatsSDK {
   readonly etherscan: Etherscan;
   readonly log: Log;
   readonly plugins: Plugins;
+  readonly vm: any;
 
   readonly adapterListSubgraph: string;
   readonly executionTimeout: number;
@@ -55,10 +57,13 @@ export abstract class BaseCryptoStatsSDK {
     redisConnectionString,
     executionTimeout = 30,
     adapterListSubgraph = 'dmihal/cryptostats-adapter-registry-test',
+    vm,
     onLog,
   }: CryptoStatsOptions = {}) {
     this.executionTimeout = executionTimeout;
     this.adapterListSubgraph = adapterListSubgraph;
+
+    this.vm = vm || null;
 
     // Ensure the cache is set. This should be overwritten, but the compiler likes it :)
     this.cache = new MemoryCache();

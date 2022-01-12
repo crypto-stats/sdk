@@ -34,6 +34,7 @@ export class List {
   private adaptersById: { [id: string]: Adapter } = {};
   private bundlesById: { [id: string]: Metadata } = {};
   private sdk?: BaseCryptoStatsSDK;
+  private modules: Module[] = [];
 
   private adaptersFetched = false;
   private cacheKeyResolver: CacheKeyResolver | null = null;
@@ -198,6 +199,8 @@ export class List {
       )
     );
 
+    this.modules = this.modules.concat(modules);
+
     this.adaptersFetched = true;
     return modules;
   }
@@ -216,9 +219,15 @@ export class List {
       throw new Error('SDK not set');
     }
     const context = this.sdk.getContext(this);
-    const newModule = new Module({ code, context, executionTimeout: this.sdk.executionTimeout });
+    const newModule = new Module({
+      code,
+      context,
+      executionTimeout: this.sdk.executionTimeout,
+      vm: this.sdk.vm,
+    });
     newModule.evaluate();
     newModule.setup();
+    this.modules.push(newModule);
     return newModule;
   }
 
@@ -227,8 +236,14 @@ export class List {
       throw new Error('SDK not set');
     }
     const context = this.sdk.getContext(this);
-    const newModule = new Module({ setupFn, context, executionTimeout: this.sdk.executionTimeout });
+    const newModule = new Module({
+      setupFn,
+      context,
+      executionTimeout: this.sdk.executionTimeout,
+      vm: this.sdk.vm,
+    });
     newModule.setup();
+    this.modules.push(newModule);
     return newModule;
   }
 
@@ -236,6 +251,12 @@ export class List {
     this.cacheKeyResolver = resolver;
     for (const adapter of this.adapters) {
       adapter.setCacheKeyResolver(resolver);
+    }
+  }
+
+  cleanupModules() {
+    for (const module of this.modules) {
+      module.cleanup()
     }
   }
 }

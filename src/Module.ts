@@ -1,4 +1,4 @@
-import vm from 'vm';
+import nodeVm from 'vm';
 import { ethers } from 'ethers';
 import { Context } from './Context'
 import { SetupFn } from './types';
@@ -15,6 +15,7 @@ interface ModuleProps {
   sourceFile?: string;
   previousVersion?: string;
   executionTimeout?: number;
+  vm?: any;
 }
 
 const SIGNATURE_REGEX = /\nexports.signer = ['"](0x[0-9a-fA-F]{40})['"];\nexports.signature = ['"](0x[0-9a-fA-F]{130})['"];\n/
@@ -29,14 +30,18 @@ export class Module {
   previousVersion: string | null;
   signer: string | null = null;
   signature: string | null = null;
+  vm: typeof nodeVm | null = null;
 
   public code: string | null;
   public setupFn: SetupFn | null = null;
   private context: Context;
   private executionTimeout: number;
 
+  private cleanableScripts: any[] = [];
+
   constructor({
-    code, setupFn, context, name, version, license, description, changeLog, sourceFile, previousVersion, executionTimeout = 30
+    code, setupFn, context, name, version, license, description, changeLog, sourceFile, previousVersion,
+    vm, executionTimeout = 30
   }: ModuleProps) {
     if (code && setupFn) {
       throw new Error('Can not provide code and setup function');
@@ -54,6 +59,7 @@ export class Module {
     this.sourceFile = sourceFile || null;
     this.previousVersion = previousVersion || null;
     this.context = context;
+    this.vm = vm || null;
     this.executionTimeout = executionTimeout;
 
     if (code) {
@@ -80,6 +86,8 @@ export class Module {
     if (this.setupFn || !this.code) {
       throw new Error('Can not evaluate, setup function already set');
     }
+
+    const vm = this.vm || nodeVm;
 
     // Node VMs are dangerous! We jump through a bunch of hoops to sandbox the script
     // Really, we should be using a tested package like VM2, however they don't support
@@ -117,6 +125,10 @@ export class Module {
       timeout: this.executionTimeout,
     });
 
+    if((script as any).cleanup) {
+      this.cleanableScripts.push(script);
+    }
+
     if (!vmModule.exports.setup) {
       throw new Error('Adapter did not export a setup function')
     }
@@ -136,5 +148,11 @@ export class Module {
     }
 
     this.setupFn(this.context);
+  }
+
+  cleanup() {
+    for (const script of this.cleanableScripts) {
+      script.cleanup();
+    }
   }
 }

@@ -1,7 +1,15 @@
 import { MemoryCache } from './caches/MemoryCache';
-import { BaseCryptoStatsSDK } from './BaseCryptoStatsSDK';
+import { BaseCryptoStatsSDK, CryptoStatsOptions } from './BaseCryptoStatsSDK';
+import * as browserVM from './utils/browser-vm';
 
 export class BrowserCryptoStatsSDK extends BaseCryptoStatsSDK {
+  constructor(options: CryptoStatsOptions) {
+    super({
+      vm: browserVM,
+      ...options,
+    });
+  }
+
   setupCache({ mongoConnectionString, redisConnectionString }: {
     mongoConnectionString?: string;
     redisConnectionString?: string;

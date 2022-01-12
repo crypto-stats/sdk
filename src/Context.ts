@@ -8,7 +8,7 @@ import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
 import { Log, LogInterface } from './libs/Log';
 import { Plugins } from './libs/Plugins';
-import { List } from './List';
+import { List as Collection } from './List';
 
 interface RegistrationData {
   id: string;
@@ -28,7 +28,7 @@ export interface ContextProps {
   etherscan: Etherscan;
   log: Log;
   plugins: Plugins;
-  list: List;
+  collection: Collection;
 }
 
 export class Context {
@@ -43,7 +43,8 @@ export class Context {
   readonly log: LogInterface;
   readonly plugins: Plugins;
 
-  private list: List;
+  readonly register: (registration: RegistrationData) => void;
+  readonly registerBundle: (id: string, metadata?: any) => void;
 
   constructor({
     coinGecko,
@@ -56,7 +57,7 @@ export class Context {
     etherscan,
     log,
     plugins,
-    list,
+    collection,
   }: ContextProps) {
     this.coinGecko = coinGecko;
     this.chainData = chainData;
@@ -69,14 +70,12 @@ export class Context {
     this.log = log.getLogInterface();
     this.plugins = plugins;
 
-    this.list = list;
-  }
+    this.register = (registration: RegistrationData) => {
+      collection.addAdapter(registration);
+    };
 
-  register(registration: RegistrationData) {
-    this.list.addAdapter(registration);
-  }
-
-  registerBundle(id: string, metadata?: any) {
-    this.list.addBundle(id, metadata);
+    this.registerBundle = (id: string, metadata?: any) => {
+      collection.addBundle(id, metadata);
+    };
   }
 }

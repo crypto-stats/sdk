@@ -126,7 +126,7 @@ export abstract class BaseCryptoStatsSDK {
     return this.getCollection(name);
   }
 
-  getContext(list: List) {
+  getContext(collection: List) {
     const context = new Context({
       coinGecko: this.coinGecko,
       chainData: this.chainData,
@@ -138,7 +138,7 @@ export abstract class BaseCryptoStatsSDK {
       etherscan: this.etherscan,
       log: this.log,
       plugins: this.plugins,
-      list,
+      collection,
     });
     return context;
   }

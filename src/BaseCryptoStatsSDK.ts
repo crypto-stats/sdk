@@ -45,7 +45,7 @@ export abstract class BaseCryptoStatsSDK {
   readonly adapterListSubgraph: string;
   readonly executionTimeout: number;
 
-  private lists: { [name: string]: List } = {};
+  private collections: { [name: string]: List } = {};
 
   constructor({
     ipfsGateway,
@@ -112,11 +112,18 @@ export abstract class BaseCryptoStatsSDK {
 
   protected abstract setupCache(params: { mongoConnectionString?: string; redisConnectionString?: string }): void;
 
-  getList(name: string) {
-    if (!this.lists[name]) {
-      this.lists[name] = new List(name, this);
+  getCollection(name: string) {
+    if (!this.collections[name]) {
+      this.collections[name] = new List(name, this);
     }
-    return this.lists[name];
+    return this.collections[name];
+  }
+
+  /**
+   * @deprecated Use getCollection instead
+   */
+  getList(name: string) {
+    return this.getCollection(name);
   }
 
   getContext(list: List) {

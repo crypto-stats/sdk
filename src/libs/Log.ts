@@ -10,6 +10,7 @@ interface LogOptions {
 }
 
 export interface LogInterface {
+  (...args: any[]): void;
   log(...args: any[]): void;
   error(...args: any[]): void;
   warn(...args: any[]): void;
@@ -45,12 +46,14 @@ export class Log {
   }
 
   getLogInterface(): LogInterface {
-    return {
+    const log = (...args: any[]) => this.logListener(LOG_LEVEL.INFO, ...args);
+
+    return Object.assign(log, {
       debug: (...args: any[]) => this.logListener(LOG_LEVEL.DEBUG, ...args),
-      info: (...args: any[]) => this.logListener(LOG_LEVEL.INFO, ...args),
-      log: (...args: any[]) => this.logListener(LOG_LEVEL.INFO, ...args),
+      info: log,
+      log,
       warn: (...args: any[]) => this.logListener(LOG_LEVEL.WARN, ...args),
       error: (...args: any[]) => this.logListener(LOG_LEVEL.ERROR, ...args),
-    };
+    });
   }
 }

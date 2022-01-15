@@ -256,7 +256,9 @@ export class List {
 
   cleanupModules() {
     for (const module of this.modules) {
-      module.cleanup()
+      module.cleanup();
     }
   }
 }
+
+export const Collection = List;

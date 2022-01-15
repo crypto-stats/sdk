@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Context } from '../src/Context';
-import { List } from '../src/List';
+import { Collection } from '../src/List';
 import { Module } from '../src/Module';
 import { createContext } from './helper';
 
@@ -8,8 +8,8 @@ describe('Module', function() {
   it('should add adapters to a list using code', async function () {
     this.timeout(5000);
 
-    const list = new List('fees');
-    const context = createContext({ list });
+    const collection = new Collection('fees');
+    const context = createContext({ collection });
 
     const code = `
       module.exports.name = 'Polymarket';
@@ -42,7 +42,7 @@ describe('Module', function() {
 
     polymarketModule.setup();
 
-    const adapters = list.getAdapters();
+    const adapters = collection.getAdapters();
     expect(adapters.length).to.equal(1);
 
     const metadata = await adapters[0].getMetadata();
@@ -55,8 +55,8 @@ describe('Module', function() {
   it('should add adapters to a list using a function', async function () {
     this.timeout(5000);
 
-    const list = new List('fees');
-    const context = createContext({ list });
+    const collection = new Collection('fees');
+    const context = createContext({ collection });
 
     const setupFn = function setup(context: Context) {
       context.register({
@@ -72,7 +72,7 @@ describe('Module', function() {
     const polymarketModule = new Module({ setupFn, context });
     polymarketModule.setup();
 
-    const adapters = list.getAdapters();
+    const adapters = collection.getAdapters();
     expect(adapters.length).to.equal(1);
 
     const metadata = await adapters[0].getMetadata();
@@ -83,8 +83,8 @@ describe('Module', function() {
   });
 
   it('should not allow escaping the sandbox using constructors', () => {
-    const list = new List('fees');
-    const context = createContext({ list });
+    const collection = new Collection('fees');
+    const context = createContext({ collection });
 
     const fail: any = () => {
       throw new Error('Escaped sandbox');
@@ -121,8 +121,8 @@ describe('Module', function() {
       return prototype === null || prototype === Object.prototype
     }
 
-    const list = new List('fees');
-    const context = createContext({ list });
+    const collection = new Collection('fees');
+    const context = createContext({ collection });
 
     const code = `
       module.exports.name = 'Polymarket';
@@ -149,7 +149,7 @@ describe('Module', function() {
 
     polymarketModule.setup();
 
-    const adapters = list.getAdapters();
+    const adapters = collection.getAdapters();
     expect(adapters.length).to.equal(1);
 
     const metadata = await adapters[0].getMetadata();
@@ -162,8 +162,8 @@ describe('Module', function() {
   it('should verify signed adapter code', async function () {
     this.timeout(5000);
 
-    const list = new List('fees');
-    const context = createContext({ list });
+    const collection = new Collection('fees');
+    const context = createContext({ collection });
 
     const code = `"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -198,8 +198,8 @@ exports.signature = '0x65ac2f14c5808cc56d8dc4409c0557dbe51fb537f6b890bae1cd9dae0
   it('should reject invalid signature', async function () {
     this.timeout(5000);
 
-    const list = new List('fees');
-    const context = createContext({ list });
+    const collection = new Collection('fees');
+    const context = createContext({ collection });
 
     const code = `"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });

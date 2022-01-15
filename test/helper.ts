@@ -15,7 +15,7 @@ export function createContext(props: Partial<ContextProps> = {}) {
     log: new Log(),
     plugins: {} as any,
     ipfs,
-    list: {} as any,
+    collection: {} as any,
     ...props,
   });
 

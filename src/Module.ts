@@ -147,7 +147,11 @@ export class Module {
       throw new Error('Code not evaluated');
     }
 
-    this.setupFn(this.context);
+    try {
+      this.setupFn(this.context);
+    } catch (e: any) {
+      throw new Error(`Error setting up module ${this.name}: ${e.message}`);
+    }
   }
 
   cleanup() {

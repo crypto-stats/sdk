@@ -225,7 +225,12 @@ export class List {
       executionTimeout: this.sdk.executionTimeout,
       vm: this.sdk.vm,
     });
-    newModule.evaluate();
+    try {
+      newModule.evaluate();
+    } catch (e: any) {
+      throw new Error(`Error evaluating module [${code.substring(0, 20)}]: ${e.message}`)
+    }
+
     newModule.setup();
     this.modules.push(newModule);
     return newModule;

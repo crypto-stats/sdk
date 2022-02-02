@@ -66,6 +66,28 @@ describe('Adapter', function() {
     expect(await adapter.query('tvl', testDate)).to.equal(50);
   });
 
+  it('should read query data from the cache', async function() {
+    const testDate = '2021-01-01';
+
+    const cache = new MemoryCache();
+    cache.setValue('polymarket', 'fee', testDate, 100);
+    cache.setValue('polymarket', 'tvl', testDate, 25);
+
+    const adapter = new Adapter('polymarket', {
+      metadata: {},
+      cache: cache,
+    });
+
+    adapter.setCacheKeyResolver((_id: string, query: string, params: string[]) => query === 'fee' ? params[0] : null);
+
+    // The adapter should return 50, since skips the cache
+    adapter.addQuery('fee', async () => 50);
+    adapter.addQuery('tvl', async () => 50);
+
+    expect(await adapter.query('fee', testDate, { refreshCache: true })).to.equal(50);
+    expect(await adapter.query('tvl', testDate, { refreshCache: true })).to.equal(50);
+  });
+
   it('should execute adapters with arbitrary numbers of parameters', async function() {
     const cache = new MemoryCache();
     const adapter = new Adapter('polymarket', {

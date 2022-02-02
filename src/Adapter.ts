@@ -37,10 +37,19 @@ export class Adapter {
 
   async query(type: string, ...input: any[]) {
     let _input = input;
+
     let allowMissingQuery = false;
-    if (input.length > 0 && input[input.length - 1].allowMissingQuery) {
+    let refreshCache = false;
+    const lastElement = input.length > 0 ? input[input.length - 1] : null;
+    if (lastElement?.allowMissingQuery || lastElement?.refreshCache) {
+      if (lastElement.allowMissingQuery) {
+        allowMissingQuery = true;
+      }
+      if (lastElement.refreshCache) {
+        refreshCache = true;
+      }
+
       _input = input.slice(0, -1);
-      allowMissingQuery = true;
     }
 
     if (allowMissingQuery && !this.queries[type]) {
@@ -48,7 +57,7 @@ export class Adapter {
     }
 
     const cacheKey = this.cacheKeyResolver ? this.cacheKeyResolver(this.id, type, input) : null;
-    const cachedValue = cacheKey && await this.cache?.getValue(this.id, type, cacheKey);
+    const cachedValue = cacheKey && !refreshCache && await this.cache?.getValue(this.id, type, cacheKey);
 
     if (cachedValue) {
       return cachedValue;

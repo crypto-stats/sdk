@@ -22,6 +22,14 @@ export class DateLib {
     return this.formatDate(date);
   }
 
+  getNextDay(date: string) {
+    return this.offsetDaysFormatted(date, 1);
+  }
+
+  getPreviousDay(date: string) {
+    return this.offsetDaysFormatted(date, -1);
+  }
+
   last7Days(date?: Date) {
     return [...new Array(7)]
       .map((_, num: number) => this.formatDate(subDays(date || new Date(), 7 - num)));

@@ -40,6 +40,6 @@ export class MongoCache {
     await this.client
       .db(this.dbName)
       .collection(this.collectionName)
-      .insertOne({ name, type, key, value });
+      .updateOne({ name, type, key }, { $set: { name, type, key, value } }, { upsert: true });
   }
 }

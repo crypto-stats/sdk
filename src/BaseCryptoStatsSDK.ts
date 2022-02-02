@@ -96,9 +96,11 @@ export abstract class BaseCryptoStatsSDK {
         const url = `https://speedy-nodes-nyc.moralis.io/${moralisKey}/eth/${network}/archive`;
         this.ethers.addProvider(network === 'mainnet' ? 'ethereum' : network, url, { archive: true });
       }
-      this.ethers.addProvider('arbitrum', `https://speedy-nodes-nyc.moralis.io/${moralisKey}/arbitrum/mainnet`);
+      this.ethers.addProvider('arbitrum-one', `https://speedy-nodes-nyc.moralis.io/${moralisKey}/arbitrum/mainnet`, { archive: true });
       this.ethers.addProvider('polygon', `https://speedy-nodes-nyc.moralis.io/${moralisKey}/polygon/mainnet/archive`, { archive: true });
       this.ethers.addProvider('bsc', `https://speedy-nodes-nyc.moralis.io/${moralisKey}/bsc/mainnet/archive`, { archive: true });
+      this.ethers.addProvider('avalanche', `https://speedy-nodes-nyc.moralis.io/${moralisKey}/avalanche/mainnet`, { archive: true });
+      this.ethers.addProvider('fantom', `https://speedy-nodes-nyc.moralis.io/${moralisKey}/fantom/mainnet`, { archive: true });
     } else if (infuraKey) {
       const networks = ['mainnet', 'kovan', 'ropsten', 'goerli', 'rinkeby'];
       for (const network of networks) {

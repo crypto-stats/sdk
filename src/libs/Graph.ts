@@ -5,7 +5,8 @@ interface GraphProps {
 }
 
 export interface QueryOptions {
-  subgraph: string;
+  subgraph?: string;
+  subgraphId?: string;
   query: string;
   variables?: any;
   operationName?: string;
@@ -33,8 +34,13 @@ export class Graph {
       ...(typeof subgraph !== 'string' ? subgraph : null),
     }
 
+    if (!options.subgraph && !options.subgraphId) {
+      throw new Error(`Must set a subgraph or subgraphId`)
+    }
+
     const node = options.node || DEFAULT_NODE;
-    const response = await this.http.post(`${node}/subgraphs/name/${options.subgraph}`, {
+    const url = options.subgraphId ? `${node}/subgraphs/id/${options.subgraphId}` : `${node}/subgraphs/name/${options.subgraph}`
+    const response = await this.http.post(url, {
         query: options.query,
         variables: options.variables || {},
         operationName: options.operationName || null,

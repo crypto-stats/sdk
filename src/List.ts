@@ -11,11 +11,14 @@ interface AdapterData {
   bundle?: string | null;
 }
 
-export interface ResultWithMetadata {
+export interface SingleResult {
   id: string;
   bundle: string | null;
   result?: any;
   error?: any;
+}
+
+export interface ResultWithMetadata extends SingleResult {
   metadata: { [key: string]: any };
 }
 
@@ -99,9 +102,10 @@ export class List {
     return Promise.all(this.bundleIds.map((id: string) => this.bundlesById[id].getMetadata()));
   }
 
-  async executeQuery(type: string, ...params: any[]) {
+  async executeQuery(type: string, ...params: any[]): Promise<SingleResult[]> {
     return Promise.all(this.adapters.map(async (adapter: Adapter) => {
-      const result = await adapter.query(type, ...params);
+      const result = await adapter.query(type, ...params)
+        .catch(error => ({ error }));
 
       const response: any = {
         id: adapter.id,
@@ -109,7 +113,7 @@ export class List {
       };
 
       if (result?.error) {
-        response.error = result.error;
+        response.error = result.error.message || result.error;
         response.result = null;
       } else {
         response.result = result;

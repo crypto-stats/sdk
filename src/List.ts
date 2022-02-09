@@ -136,7 +136,7 @@ export class List {
         metadata,
       };
 
-      return result.error
+      return result?.error
         ? { ...response, error: result.error.message || result.error }
         : { ...response, result };
     }))
@@ -156,7 +156,7 @@ export class List {
       
       types.forEach((type: string, index: number) => {
         const result = resultsList[index]
-        if (result.error) {
+        if (result?.error) {
           errors[type] = result.error.message || result.error;
         } else {
           results[type] = result;

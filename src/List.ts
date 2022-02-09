@@ -133,7 +133,6 @@ export class List {
       const response = {
         id: adapter.id,
         bundle: adapter.bundle,
-        result,
         metadata,
       };
 

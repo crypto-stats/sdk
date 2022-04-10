@@ -66,4 +66,41 @@ describe('Graph', function() {
       },
     });
   });
+
+  it('should query data from a the decentralized Graph network', async () => {
+    const query = `query collected {
+      ens(id: "ens", block: { number: 14000000 }) {
+        ethCollected
+      }
+    }`;
+
+    const result = await graph.query({
+      subgraphId: '9ZA2QGwURbZ8S3PfdKs4UyKKTvyoHfG4SsLkGBaiVi1Y',
+      query,
+      // Variables are not supported yet, will be fixed in the future
+      // variables: { block: 14000000 },
+    });
+
+    expect(result).to.deep.equal({
+      ens: {
+        ethCollected: '10732.085247563696871674',
+      }
+    });
+  });
+
+  it('should query data from normal GraphQL endpoints', async () => {
+    const query = `query {
+      pool(address: "wrmcMSHFi3sWpAEy4rGDvQb3ezh3PhXoV2xNjgLBkKU") {
+        name
+      }
+    }`;
+
+    const result = await graph.query('https://saberqltest.aleph.cloud/?', query);
+
+    expect(result).to.deep.equal({
+      pool: {
+        name: 'soETH-ETH',
+      },
+    });
+  });
 });

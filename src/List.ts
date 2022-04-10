@@ -99,7 +99,10 @@ export class List {
   }
 
   getBundles() {
-    return Promise.all(this.bundleIds.map((id: string) => this.bundlesById[id].getMetadata()));
+    return Promise.all(this.bundleIds.map(async (id: string) => ({
+      id,
+      metadata: await this.bundlesById[id].getMetadata(),
+    })));
   }
 
   async executeQuery(type: string, ...params: any[]): Promise<SingleResult[]> {

@@ -31,7 +31,7 @@ export class Etherscan {
 
     const result = await this.http.get(`https://${domain}/api?${urlParams}`)
     if (result.status !== '1') {
-      throw new Error(`Error with Etherescan query: ${result.result}`);
+      throw new Error(`Error with Etherescan query: ${result.message || result.result}`);
     }
 
     return result.result;

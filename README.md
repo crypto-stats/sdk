@@ -2,7 +2,7 @@
 
 Toolkit for loading, building & executing CryptoStats adapters.
 
-## Instalation & setup
+## Installation & setup
 
 ```
 $ yarn add @cryptostats/sdk

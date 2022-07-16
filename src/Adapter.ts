@@ -1,6 +1,7 @@
 import { clean } from './utils/clean';
 import { ICache } from './types';
 import { Metadata } from './Metadata';
+import { timeoutPromise } from './utils/timeout';
 
 export type QueryFn<Output = any, Input extends unknown[] = any[]> = (...params: Input) => Promise<Output>
 
@@ -35,11 +36,13 @@ export class Adapter {
     this.queries[type] = query;
   }
 
-  async query(type: string, ...input: any[]) {
+  async query<Output = any>(type: string, ...input: any[]) {
     let _input = input;
 
     let allowMissingQuery = false;
     let refreshCache = false;
+    let timeout = 60 * 1000; // One minute default timeout
+
     const lastElement = input.length > 0 ? input[input.length - 1] : null;
     if (lastElement?.allowMissingQuery || lastElement?.refreshCache) {
       if (lastElement.allowMissingQuery) {
@@ -47,6 +50,9 @@ export class Adapter {
       }
       if (lastElement.refreshCache) {
         refreshCache = true;
+      }
+      if (lastElement.timeout) {
+        timeout = lastElement.timeout;
       }
 
       _input = input.slice(0, -1);
@@ -60,19 +66,19 @@ export class Adapter {
     const cachedValue = cacheKey && !refreshCache && await this.cache?.getValue(this.id, type, cacheKey);
 
     if (cachedValue) {
-      return cachedValue;
+      return cachedValue as Output;
     } else {
-      const result = await this.executeQuery(type, ..._input);
+      const result = await timeoutPromise(this.executeQuery(type, ..._input), timeout);
 
       if (cacheKey) {
         await this.cache?.setValue(this.id, type, cacheKey, result);
       }
 
-      return result;
+      return result as Output;
     }
   }
 
-  async executeQuery(type: string, ...params: any[]) {
+  async executeQuery<Output = any>(type: string, ...params: any[]): Promise<Output> {
     if (!this.queries[type]) {
       throw new Error(`Adapter ${this.id} does not support ${type} queries`);
     }
@@ -80,7 +86,7 @@ export class Adapter {
     try {
       const result = clean(await this.queries[type](...params));
 
-      return result;
+      return result as Output;
     } catch (e: any) {
       throw new Error(`Error executing ${type} on ${this.id}: ${e.message}`);
     }

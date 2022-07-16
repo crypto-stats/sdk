@@ -1,6 +1,6 @@
 {
   "name": "@cryptostats/sdk",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "description": "Download and execute CryptoStats adapters",
   "main": "dist/node.js",
   "browser": "dist/browser.js",
@@ -31,6 +31,7 @@
     "it-all": "^1.0.5",
     "mongodb": "^4.0.0",
     "redis": "^3.1.2",
-    "uint8arrays": "^2.1.7"
+    "uint8arrays": "^2.1.7",
+    "wtfnode": "^0.9.1"
   }
 }

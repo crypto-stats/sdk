@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { Adapter } from '../src/Adapter';
 import { BaseCryptoStatsSDK } from '../src/BaseCryptoStatsSDK';
 import { MemoryCache } from '../src/caches/MemoryCache';
-import { Collection, List } from '../src/List';
+import { Collection, List } from '../src/Collection';
 
 const POLYGON_MODULE_CODE = `
   module.exports.name = 'Polymarket';
@@ -19,7 +19,7 @@ const POLYGON_MODULE_CODE = `
   }
 `;
 
-describe('List', function() {
+describe('Collection', function() {
   it('should fetch modules', async function() {
     const sdk = {
       adapterListSubgraph: 'test/subgraph',
@@ -49,7 +49,7 @@ describe('List', function() {
           return POLYGON_MODULE_CODE;
         },
       },
-      getContext(_list: List) {
+      getContext(_list: Collection) {
         return {
           register(registration: any) {
             _list.addAdapter(registration);
@@ -105,7 +105,7 @@ describe('List', function() {
           return POLYGON_MODULE_CODE;
         },
       },
-      getContext(_list: List) {
+      getContext(_list: Collection) {
         return {
           register(registration: any) {
             _list.addAdapter(registration);
@@ -132,7 +132,7 @@ describe('List', function() {
           return POLYGON_MODULE_CODE;
         },
       },
-      getContext(_list: List) {
+      getContext(_list: Collection) {
         return {
           register(registration: any) {
             _list.addAdapter(registration);

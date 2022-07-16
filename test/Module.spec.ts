@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Context } from '../src/Context';
-import { Collection } from '../src/List';
+import { Collection } from '../src/Collection';
 import { Module } from '../src/Module';
 import { createContext } from './helper';
 

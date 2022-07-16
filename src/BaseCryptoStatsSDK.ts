@@ -9,7 +9,7 @@ import { HTTP } from './libs/HTTP';
 import { Log, LOG_LEVEL } from './libs/Log';
 import { Plugins } from './libs/Plugins';
 import { Context } from './Context';
-import { List } from './List';
+import { Collection } from './Collection';
 import { ICache } from './types';
 import { Etherscan } from './libs/Etherscan';
 
@@ -45,7 +45,7 @@ export abstract class BaseCryptoStatsSDK {
   readonly adapterListSubgraph: string;
   readonly executionTimeout: number;
 
-  private collections: { [name: string]: List } = {};
+  private collections: { [name: string]: Collection } = {};
 
   constructor({
     ipfsGateway,
@@ -116,7 +116,7 @@ export abstract class BaseCryptoStatsSDK {
 
   getCollection(name: string) {
     if (!this.collections[name]) {
-      this.collections[name] = new List(name, this);
+      this.collections[name] = new Collection(name, this);
     }
     return this.collections[name];
   }
@@ -128,7 +128,7 @@ export abstract class BaseCryptoStatsSDK {
     return this.getCollection(name);
   }
 
-  getContext(collection: List) {
+  getContext(collection: Collection) {
     const context = new Context({
       coinGecko: this.coinGecko,
       chainData: this.chainData,

@@ -8,7 +8,7 @@ import { Graph } from './libs/Graph';
 import { HTTP } from './libs/HTTP';
 import { Log, LogInterface } from './libs/Log';
 import { Plugins } from './libs/Plugins';
-import { List as Collection } from './List';
+import { Collection } from './Collection';
 
 interface RegistrationData {
   id: string;

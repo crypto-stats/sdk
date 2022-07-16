@@ -30,7 +30,7 @@ export interface ResultsWithMetadata {
   metadata: { [key: string]: any };
 }
 
-export class List {
+export class Collection {
   readonly name: string;
   readonly adapters: Adapter[] = [];
   readonly bundleIds: string[] = [];
@@ -276,4 +276,4 @@ export class List {
   }
 }
 
-export const Collection = List;
+export const List = Collection;

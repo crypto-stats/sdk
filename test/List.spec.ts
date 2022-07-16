@@ -1,7 +1,8 @@
 import { expect } from 'chai';
+import { Adapter } from '../src/Adapter';
 import { BaseCryptoStatsSDK } from '../src/BaseCryptoStatsSDK';
 import { MemoryCache } from '../src/caches/MemoryCache';
-import { List } from '../src/List';
+import { Collection, List } from '../src/List';
 
 const POLYGON_MODULE_CODE = `
   module.exports.name = 'Polymarket';
@@ -147,6 +148,16 @@ describe('List', function() {
     expect(list.adapters.length).to.equal(1);
     expect(list.adapters[0].id).to.equal('polymarket');
   });
+
+  it('should manually add existing adapters', async function() {
+    const collection = new Collection('test');
+    const adapter = new Adapter('test-id', { metadata: {} });
+
+    collection.addAdapter(adapter);
+
+    expect(collection.adapters.length).to.equal(1);
+    expect(collection.adapters[0].id).to.equal('test-id');
+  })
 
   describe('queries', function() {
     it('should execute a single query', async function () {

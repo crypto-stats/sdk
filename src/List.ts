@@ -47,24 +47,28 @@ export class List {
     this.sdk = sdk;
   }
 
-  addAdapter({ id, queries, metadata, bundle }: AdapterData) {
-    if (this.adaptersById[id]) {
-      throw new Error(`Adapter '${id}' already added`);
+  addAdapter(adapterData: AdapterData | Adapter): Adapter {
+    if (this.adaptersById[adapterData.id]) {
+      throw new Error(`Adapter '${adapterData.id}' already added`);
     }
 
-    const adapter = new Adapter(id, {
-      metadata,
-      cache: this.sdk?.cache,
-      bundle,
-      cacheKeyResolver: this.cacheKeyResolver,
-    });
-
-    for (let name in queries) {
-      adapter.addQuery(name, queries[name]);
+    let adapter: Adapter;
+    if (adapterData instanceof Adapter) {
+      adapter = adapterData as Adapter;
+    } else {
+      adapter = new Adapter(adapterData.id, {
+        metadata: adapterData.metadata,
+        cache: this.sdk?.cache,
+        bundle: adapterData.bundle,
+        cacheKeyResolver: this.cacheKeyResolver,
+      });
+      for (let name in adapterData.queries) {
+        adapter.addQuery(name, adapterData.queries[name]);
+      }
     }
 
     this.adapters.push(adapter);
-    this.adaptersById[id] = adapter;
+    this.adaptersById[adapter.id] = adapter;
 
     return adapter;
   }

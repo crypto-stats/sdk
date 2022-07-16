@@ -74,7 +74,7 @@ describe('List', function() {
 
     expect(list.bundleIds).to.deep.equal(['uniswap']);
     expect(await list.getBundle('uniswap')).to.deep.equal({ name: 'Uniswap' });
-    expect(await list.getBundles()).to.deep.equal([{ name: 'Uniswap' }]);
+    expect(await list.getBundles()).to.deep.equal([{ id: 'uniswap', metadata: { name: 'Uniswap' } }]);
   });
 
   it('should skip fetching a second time', async function() {

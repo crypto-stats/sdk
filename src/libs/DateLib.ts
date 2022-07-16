@@ -98,7 +98,22 @@ export class DateLib {
     return days;
   }
 
+  /**
+   * @param {string} date - A YYYY-MM-DD formatted date
+   * @param {number} numDays - The number of days to shift (may be negative)
+   * @returns {string} An adjusted YYYY-MM-DD formatted date
+   */
   offsetDaysFormatted(date: string, numDays: number) {
     return this.formatDate(addDays(new Date(date), numDays));
+  }
+
+  /**
+   * Alias for offsetDaysFormatted
+   * @param {string} date - A YYYY-MM-DD formatted date
+   * @param {number} numDays - The number of days to shift (may be negative)
+   * @returns {string} An adjusted YYYY-MM-DD formatted date
+   */
+  addDays(date: string, numDays: number) {
+    return this.offsetDaysFormatted(date, numDays);
   }
 }

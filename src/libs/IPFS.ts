@@ -1,8 +1,6 @@
-import ipfsClient from 'ipfs-http-client';
-import CID from 'cids';
-import type { RootAPI as IPFSClient } from 'ipfs-core-types';
-import uint8ArrayConcat from 'uint8arrays/concat';
-import all from 'it-all';
+import 'isomorphic-fetch';
+
+declare const fetch: any;
 
 interface IPFSOptions {
   gateway?: string;
@@ -15,40 +13,34 @@ interface IPFSLoader {
 }
 
 export class IPFS {
-  private client: IPFSClient;
+  private gateway: string;
 
   constructor({
-    gateway = 'https://ipfs.cryptostats.community',
+    gateway = 'https://cryptostats.infura-ipfs.io',
   }: IPFSOptions = {}) {
-    this.client = ipfsClient({ url: gateway }) as IPFSClient;
+    this.gateway = gateway;
   }
 
-  async getFile(cid: string | CID) {
-    for await (const file of this.client.get(cid)) {
-      if (file.type !== 'file') {
-        throw new Error(`CID ${cid.toString()} is a ${file.type}, expected file`);
-      }
-
-      if (!(file as any).content) continue;
-
-      let content = '';
-
-      for await (const chunk of (file as any).content) {
-        content += chunk.toString('utf8');
-      }
-
-      return content;
+  async getFile(cid: string) {
+    const res = await fetch(`${this.gateway}/ipfs/${cid}`);
+    if (res.status !== 200) {
+      throw new Error(`No files found for CID ${cid}`);
     }
-    throw new Error(`No files found for CID ${cid.toString()}`);
+    const text = await res.text();
+    return text;
   }
 
-  async getDataURI(cid: string | CID, mimeType: string) {
-    const data = uint8ArrayConcat(await all(this.client.cat(cid)));
+  async getDataURI(cid: string, mimeType: string) {
+    const res = await fetch(`${this.gateway}/ipfs/${cid}`);
+    if (res.status !== 200) {
+      throw new Error(`No files found for CID ${cid}`);
+    }
+    const data = await res.arrayBuffer();
     const base64 = Buffer.from(data).toString('base64');
     return `data:${mimeType};base64,${base64}`;
   }
 
-  getDataURILoader(cid: string | CID, mimeType: string): IPFSLoader {
+  getDataURILoader(cid: string, mimeType: string): IPFSLoader {
     const fn = () => this.getDataURI(cid, mimeType);
 
     return Object.assign(fn, { cid: cid.toString(), mimeType });

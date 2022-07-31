@@ -17,12 +17,12 @@ describe('Graph', function() {
     }`;
 
     const result = await graph.query('dmihal/polygon-fees', query, {
-      block: 500,
+      block: 5499000,
     });
 
     expect(result).to.deep.equal({
       fee: {
-        totalFees: '0.000042',
+        totalFees: '0.144133145',
       }
     });
   });
@@ -35,7 +35,7 @@ describe('Graph', function() {
     }`;
 
     const result = await graph.query({
-      subgraphId: 'QmeHV6Wi38WpSbAyUCWdejW8svji3jo4g8QskebcmZd34y',
+      subgraphId: 'QmaNRUXW9g2Bo6wmcjJ2vtaae9v33sM6q4aWEfjJbc2kwU',
       query,
       variables: { block: 500 }
     });
@@ -99,7 +99,7 @@ describe('Graph', function() {
 
     expect(result).to.deep.equal({
       pool: {
-        name: 'soETH-ETH',
+        name: 'ETH-whETH',
       },
     });
   });

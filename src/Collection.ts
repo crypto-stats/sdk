@@ -86,7 +86,7 @@ export class Collection {
     return this.adapters;
   }
 
-  getAdapter(id: string) {
+  getAdapter(id: string): Adapter | null {
     return this.adaptersById[id] || null;
   }
 

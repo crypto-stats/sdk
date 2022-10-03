@@ -1,4 +1,5 @@
 import { ChainData } from './libs/ChainData';
+import { Cosmos } from './libs/Cosmos';
 import { CoinGecko } from './libs/CoinGecko';
 import { DateLib } from './libs/DateLib';
 import { Ethers } from './libs/Ethers';
@@ -19,6 +20,7 @@ interface RegistrationData {
 
 export interface ContextProps {
   coinGecko: CoinGecko;
+  cosmos: Cosmos;
   chainData: ChainData;
   date: DateLib;
   ethers: Ethers;
@@ -33,6 +35,7 @@ export interface ContextProps {
 
 export class Context {
   readonly coinGecko: CoinGecko;
+  readonly cosmos: Cosmos;
   readonly chainData: ChainData;
   readonly date: DateLib;
   readonly ethers: Ethers;
@@ -48,6 +51,7 @@ export class Context {
 
   constructor({
     coinGecko,
+    cosmos,
     chainData,
     date,
     graph,
@@ -60,6 +64,7 @@ export class Context {
     collection,
   }: ContextProps) {
     this.coinGecko = coinGecko;
+    this.cosmos = cosmos;
     this.chainData = chainData;
     this.date = date;
     this.graph = graph;

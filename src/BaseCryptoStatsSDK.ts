@@ -12,6 +12,7 @@ import { Context } from './Context';
 import { Collection } from './Collection';
 import { ICache } from './types';
 import { Etherscan } from './libs/Etherscan';
+import { Cosmos } from './libs/Cosmos';
 
 export interface CryptoStatsOptions {
   ipfsGateway?: string;
@@ -31,6 +32,7 @@ export abstract class BaseCryptoStatsSDK {
   public cache: ICache;
   
   readonly coinGecko: CoinGecko;
+  readonly cosmos: Cosmos;
   readonly chainData: ChainData;
   readonly date: DateLib;
   readonly ethers: Ethers;
@@ -77,6 +79,7 @@ export abstract class BaseCryptoStatsSDK {
     this.plugins = new Plugins();
     this.date = new DateLib();
     this.http = new HTTP();
+    this.cosmos = new Cosmos();
     this.ipfs = new IPFS({ gateway: ipfsGateway });
     this.log = new Log({ onLog });
     this.graph = new Graph({ http: this.http });
@@ -110,6 +113,10 @@ export abstract class BaseCryptoStatsSDK {
     }
     this.ethers.addProvider('optimism', 'https://mainnet.optimism.io', { archive: true });
     this.ethers.addProvider('arbitrum-one', 'https://arb1.arbitrum.io/rpc');
+
+    this.cosmos.addChain('cosmoshub', 'https://rpc.cosmos.network/');
+    this.cosmos.addChain('osmosis', 'https://rpc.osmosis.zone/');
+    this.cosmos.addChain('juno', 'https://juno-rpc.polkachu.com/');
   }
 
   protected abstract setupCache(params: { mongoConnectionString?: string; redisConnectionString?: string }): void;
@@ -131,6 +138,7 @@ export abstract class BaseCryptoStatsSDK {
   getContext(collection: Collection) {
     const context = new Context({
       coinGecko: this.coinGecko,
+      cosmos: this.cosmos,
       chainData: this.chainData,
       date: this.date,
       graph: this.graph,

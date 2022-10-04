@@ -114,8 +114,8 @@ export abstract class BaseCryptoStatsSDK {
     this.ethers.addProvider('optimism', 'https://mainnet.optimism.io', { archive: true });
     this.ethers.addProvider('arbitrum-one', 'https://arb1.arbitrum.io/rpc');
 
-    this.cosmos.addChain('cosmoshub', 'https://rpc.cosmos.network/');
-    this.cosmos.addChain('osmosis', 'https://rpc.osmosis.zone/');
+    this.cosmos.addChain('cosmoshub', 'https://cosmos-mainnet-rpc.allthatnode.com:26657/');
+    this.cosmos.addChain('osmosis', 'https://osmosis-mainnet-rpc.allthatnode.com:26657/');
     this.cosmos.addChain('juno', 'https://juno-rpc.polkachu.com/');
   }
 

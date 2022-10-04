@@ -4,6 +4,16 @@ import { CoinGecko } from '../../src/libs/CoinGecko';
 import { HTTP } from '../../src/libs/HTTP';
 import { Log } from '../../src/libs/Log';
 
+class MockHTTP {
+  public nextResult: any = null;
+
+  async get(): Promise<any> {
+    return this.nextResult;
+  }
+}
+
+const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
+
 describe('CoinGecko', function() {
   let coinGecko = new CoinGecko({
     http: new HTTP(),
@@ -30,4 +40,29 @@ describe('CoinGecko', function() {
 
     expect(result).to.be.closeTo(1, 0.001);
   });
+
+  it('should cache current prices in memory', async () => {
+    const http: any = new MockHTTP();
+    coinGecko = new CoinGecko({
+      http: http,
+      cache: new MemoryCache(),
+      log: new Log(),
+      cacheExpiration: 200,
+    });
+
+    http.nextResult = { ethereum: { usd: 100 } };
+
+    let price = await coinGecko.getCurrentPrice('ethereum');
+    expect(price).to.equal(100);
+
+    http.nextResult = { ethereum: { usd: 200 } };
+
+    price = await coinGecko.getCurrentPrice('ethereum');
+    expect(price).to.equal(100);
+
+    await wait(200);
+
+    price = await coinGecko.getCurrentPrice('ethereum');
+    expect(price).to.equal(200);
+  })
 });

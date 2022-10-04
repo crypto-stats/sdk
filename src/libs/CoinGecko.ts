@@ -6,27 +6,41 @@ interface CoinGeckoProps {
   cache: ICache;
   http: HTTP;
   log: Log;
+  cacheExpiration?: number;
 }
+
+const DEFAULT_CACHE_EXPIRATION = 60 * 1000;
 
 export class CoinGecko {
   private cache: ICache;
   private http: HTTP;
   private log: LogInterface;
+  private currentPriceMemoryCache: { [key: string]: { price: number, time: number } } = {};
+  private cacheExpiration: number;
 
-  constructor({ cache, http, log }: CoinGeckoProps) {
+  constructor({ cache, http, log, cacheExpiration = DEFAULT_CACHE_EXPIRATION }: CoinGeckoProps) {
     this.cache = cache;
     this.http = http;
     this.log = log.getLogInterface();
+    this.cacheExpiration = cacheExpiration;
   }
 
   async getCurrentPrice(name: string, currency = 'usd') {
+    const key = `${name}-${currency}`;
+    if (this.currentPriceMemoryCache[key]
+      && Date.now() - this.currentPriceMemoryCache[key].time < this.cacheExpiration) {
+      return this.currentPriceMemoryCache[key].price;
+    }
+
     const response = await this.http.get(
       `https://api.coingecko.com/api/v3/simple/price?ids=${name}&vs_currencies=${currency}`
     );
     if (!response[name]) {
       throw new Error(`${name} is not a valid CoinGecko ID`);
     }
-    return response[name][currency];
+    const price = response[name][currency];
+    this.currentPriceMemoryCache[key] = { price, time: Date.now() };
+    return price;
   }
 
   async getHistoricalPrice(name: string, date: string) {

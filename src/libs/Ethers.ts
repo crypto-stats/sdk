@@ -2,16 +2,136 @@ import { ethers, utils, BigNumber, FixedNumber } from 'ethers';
 import { BlockTag } from '@ethersproject/abstract-provider';
 import { ChainData } from './ChainData';
 
+const DEFER_TIME_MS = 10;
+
+// Using https://github.com/mds1/multicall
+const MULTICALL_ADDR = '0xca11bde05977b3631167028862be2a173976ca11';
+
+const multicallChains = [
+  '0x1',
+  '0x38', // BSC
+  '0xa86a', // Avalanche
+  '0x89', // Polygon
+  '0xa', // Optimism
+  '0xa4b1', // Arb1
+  '0xfa', // Fantom
+  '0x504', // Moonbeam
+]
+
+const multicallAbi = [
+  {
+    "inputs": [
+      {
+        "name": "requireSuccess",
+        "type": "bool"
+      },
+      {
+        "components": [
+          {
+            "name": "target",
+            "type": "address"
+          },
+          {
+            "name": "callData",
+            "type": "bytes"
+          }
+        ],
+        "name": "calls",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "tryAggregate",
+    "outputs": [
+      {
+        "components": [
+          {
+            "name": "success",
+            "type": "bool"
+          },
+          {
+            "name": "returnData",
+            "type": "bytes"
+          }
+        ],
+        "name": "returnData",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+
 class Provider extends ethers.providers.JsonRpcProvider {
   public isArchive: boolean;
   private chainData: ChainData;
   private id: string;
+  private chainIdPromise: Promise<string> | null = null;
+  private deferredCalls: { to: string, data: string, callback: (err: any, result: string) => void }[] = [];
 
   constructor(url: string, id: string, archive: boolean, chainData: ChainData) {
     super(url);
     this.isArchive = archive;
     this.id = id;
     this.chainData = chainData;
+  }
+
+  getChainId() {
+    if (!this.chainIdPromise) {
+      this.chainIdPromise = super.send('eth_chainId', []);
+    }
+    return this.chainIdPromise;
+
+  }
+
+  async send(method: string, params: any[]) {
+    if (method === 'eth_chainId') {
+      return this.getChainId();
+    }
+
+    if (method === 'eth_call') {
+      const chainId = await this.getChainId();
+
+      if (multicallChains.indexOf(chainId) !== -1 && params[0].to !== MULTICALL_ADDR) {
+        return this.deferredCall(params[0].to, params[0].data);
+      }
+    }
+
+    const response = await super.send(method, params);
+    return response;
+  }
+
+  deferredCall(to: string, data: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const callback = (err: any, result: string) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(result);
+        }
+      }
+      this.deferredCalls.push({ to, data, callback });
+
+      if (this.deferredCalls.length === 1) {
+        setTimeout(async () => {
+          const calls = this.deferredCalls;
+          this.deferredCalls = [];
+
+          if (calls.length > 0) {
+            const multicall = new ethers.Contract(MULTICALL_ADDR, multicallAbi, this);
+            const result = await multicall.tryAggregate(false, calls.map(call => [call.to, call.data]));
+
+            for (let i = 0; i < result.length; i += 1) {
+              if (result[i].success) {
+                calls[i].callback(null, result[i].returnData);
+              } else {
+                calls[i].callback(result[i].returnData, '0x');
+              }
+            }
+          }
+        }, DEFER_TIME_MS);
+      }
+    });
   }
 
   async _getBlockTag(blockTag: BlockTag | Promise<BlockTag>): Promise<BlockTag> {

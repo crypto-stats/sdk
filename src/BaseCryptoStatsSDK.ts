@@ -2,6 +2,7 @@ import { MemoryCache } from './caches/MemoryCache';
 import { ChainData } from './libs/ChainData';
 import { CoinGecko } from './libs/CoinGecko';
 import { DateLib } from './libs/DateLib';
+import { DefiLlama } from './libs/DefiLlama';
 import { Ethers } from './libs/Ethers';
 import { IPFS } from './libs/IPFS';
 import { Graph } from './libs/Graph';
@@ -35,6 +36,7 @@ export abstract class BaseCryptoStatsSDK {
   readonly cosmos: Cosmos;
   readonly chainData: ChainData;
   readonly date: DateLib;
+  readonly defiLlama: DefiLlama;
   readonly ethers: Ethers;
   readonly graph: Graph;
   readonly http: HTTP;
@@ -80,6 +82,7 @@ export abstract class BaseCryptoStatsSDK {
     this.date = new DateLib();
     this.http = new HTTP();
     this.cosmos = new Cosmos();
+    this.defiLlama = new DefiLlama({ http: this.http });
     this.ipfs = new IPFS({ gateway: ipfsGateway });
     this.log = new Log({ onLog });
     this.graph = new Graph({ http: this.http });
@@ -141,6 +144,7 @@ export abstract class BaseCryptoStatsSDK {
       cosmos: this.cosmos,
       chainData: this.chainData,
       date: this.date,
+      defiLlama: this.defiLlama,
       graph: this.graph,
       http: this.http,
       ipfs: this.ipfs,

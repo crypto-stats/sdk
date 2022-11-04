@@ -2,6 +2,7 @@ import { ChainData } from './libs/ChainData';
 import { Cosmos } from './libs/Cosmos';
 import { CoinGecko } from './libs/CoinGecko';
 import { DateLib } from './libs/DateLib';
+import { DefiLlama } from './libs/DefiLlama';
 import { Ethers } from './libs/Ethers';
 import { Etherscan } from './libs/Etherscan';
 import { IPFS } from './libs/IPFS';
@@ -23,6 +24,7 @@ export interface ContextProps {
   cosmos: Cosmos;
   chainData: ChainData;
   date: DateLib;
+  defiLlama: DefiLlama;
   ethers: Ethers;
   graph: Graph;
   http: HTTP;
@@ -38,6 +40,7 @@ export class Context {
   readonly cosmos: Cosmos;
   readonly chainData: ChainData;
   readonly date: DateLib;
+  readonly defiLlama: DefiLlama;
   readonly ethers: Ethers;
   readonly graph: Graph;
   readonly http: HTTP;
@@ -54,6 +57,7 @@ export class Context {
     cosmos,
     chainData,
     date,
+    defiLlama,
     graph,
     http,
     ipfs,
@@ -67,6 +71,7 @@ export class Context {
     this.cosmos = cosmos;
     this.chainData = chainData;
     this.date = date;
+    this.defiLlama = defiLlama;
     this.graph = graph;
     this.http = http;
     this.ipfs = ipfs;
